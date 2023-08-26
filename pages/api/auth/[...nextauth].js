@@ -15,5 +15,5 @@ export default NextAuth({
             }
           })
     ],
-    secret: "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"
+    secret: "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"
 });
