@@ -51,6 +51,10 @@ export default function AboutPage() {
           </span>
         </div>
 
+        <br></br>
+        <h2>
+          Spring 2023
+        </h2>
         <table className={styles.table}>
           <thead>
             <tr>
@@ -91,6 +95,39 @@ export default function AboutPage() {
               <td>{'Develop a working and easy to use Minimal Loveable Product for the client. Working with the team I will contibute to all phases of software devlopment lifecycle for United Way. My goal will be to ensure we maintain high quality work and meet all the requirements stated by the partner.'}</td>
               <td>
                 Interfaced with customer and DreamHost to allocate a hosted database with non-profit status and hooked it up to our hosted application. Implemented the database schemas inside this database and created API calls to access the database from front-end application logic.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+		<br></br>
+        <h2>
+          Fall 2023
+        </h2>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Goal</th>
+              <th>Contributions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{'Marium Ali'}</td>
+              <td>{'Team Lead and Full Stack Engineer'}</td>
+              <td>{"Develop a working and easy to use MVP for client to be able to use. I would like the client to be able to process a new request for shelter as soon as possible identifying the duplication rules and make a decision without much manual interaction. Additionally, the interface should be easy to use and training-free. My goal is to use my expertise and make that happen as a team!"}</td>
+              <td>
+                Deliver presentations to stakeholder. Enhance approval and rejection flow. Add validation logic.
+              </td>
+            </tr>
+            <tr>
+              <td>{'Dexter Wah'}</td>
+              <td>{'Full Stack Engineer'}</td>
+              <td>{"Develop a solution to solve our client's pressing problems using user-centered design methodology and software technology. I would also like to understand the local impact financing scene and contribute to the Metro Atlanta community. My goal is to deliver value through active collaboration and needfinding!"}</td>
+              <td>
+                Setup e-mail alert for admin and agent. Add new page to track pending requests.
               </td>
             </tr>
           </tbody>
