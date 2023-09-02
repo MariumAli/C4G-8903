@@ -1,12 +1,14 @@
-import styles from '@/styles/Home.module.css';
-import styled from 'styled-components';
 import React, { useEffect, useState, useMemo } from "react";
+import { CSVLink } from "react-csv";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import SliderColumnFilter from '@/components/SliderColumnFilter';
 import SelectColumnFilter from '@/components/SelectColumnFilter';
 import filterGreaterThan from '@/components/filterGreaterThan';
 import Table from '@/components/Table';
+import styles from '@/styles/Home.module.css'
+import styled from 'styled-components';
+
 
 const Styles = styled.div`
   padding: 1rem;
@@ -48,9 +50,9 @@ const Styles = styled.div`
   .pagination {
     padding: 0.5rem;
   }
-  `
+`
 
-export default function Audit({ params }) {
+export default function AdminActions({ params }) {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [allRecords, setAllRecords] = useState([]);
@@ -270,7 +272,6 @@ export default function Audit({ params }) {
                     setAllRecords([]);
                 }
             }
-
             getAllRecords();
         },
         [router.isReady]
@@ -284,6 +285,51 @@ export default function Audit({ params }) {
             ...prevState,
             [fieldName]: fieldValue
         }));
+    }
+
+    const submitApplicationRemoveForm = async (e) => {
+        // We don't want the page to refresh
+        e.preventDefault();
+
+        if (formData.hasOwnProperty("applicationID")) {
+            let res = await fetch(
+                `/api/removeRecord?identity=${formData.applicationID}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "accept": "application/json",
+                    },
+                },
+            );
+            let res_json = await res.json();
+            console.log(`remove record call response status: ${res.status}`);
+            alert(res_json.result);
+        } else {
+            alert("An error has occurred in parsing this form, please refresh the page.");
+        }
+
+        window.location.reload();
+    }
+
+    const submitDeleteAllRecords = async (e) => {
+        // We don't want the page to refresh
+        e.preventDefault();
+
+        let res = await fetch(
+            `/api/removeAllRecords`,
+            {
+                method: "DELETE",
+                headers: {
+                    "accept": "application/json",
+                },
+                body: { id: '*' }
+            },
+        );
+        let res_json = await res.json();
+        console.log(`Remove all record call response status: ${res.status}`);
+        alert(res_json.result);
+
+        window.location.reload();
     }
 
     if (status != "authenticated") {
@@ -318,11 +364,55 @@ export default function Audit({ params }) {
         } else {
             return (
                 <main className={styles.auditmain}>
-                    <h1>Audit</h1>
+                    <h1>Admin - Pending Applications</h1>
+                    <div className={styles.container} style={{ width: '30%', minWidth: "250px" }}>
+                        <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Remove Record</h2>
+                        <p style={{ marginTop: '10px', marginBottom: "10px" }}>
+                            {"Remove a record (equivalent to a row in the table below) by it's \"ApplicationID\" field."}
+                        </p>
+                        <form id="remove-record-form" onSubmit={submitApplicationRemoveForm} style={{ overflow: 'hidden' }}>
+                            <div className={styles.container}>
+                                <label className={styles.required}>Application ID: </label>
+                                <span style={{ display: "block", overflow: "hidden", marginTop: "5px" }}>
+                                    <input type="number" required={true} name="applicationID" style={{ width: '100%' }} onChange={handleInput} value={formData.applicationID} />
+                                </span>
+                            </div>
+                            <button className={styles.button} style={{ marginTop: '10px', marginBottom: "10px" }} type="submit">Submit</button>
+                        </form>
+                    </div>
                     <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Explore Records</h2>
                     <Styles>
                         <Table columns={columns} data={allRecords} />
                     </Styles>
+                    <div className={styles.container}>
+                        <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Download Records</h2>
+                        <p style={{ marginTop: '10px', marginBottom: "10px" }}>
+                            {"Download all Records to an Excel file"}
+                        </p>
+                        {/* Export Button Start */}
+                        <CSVLink id="download-records-form" filename="records.csv"
+                            data={allRecords}
+                            className={styles.button}
+                            style={{ marginTop: '10px', marginBottom: "10px" }}>
+                            Export Records to CSV
+                        </CSVLink>
+
+                    </div>
+                    <div className={styles.container}>
+                        <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Delete All Records</h2>
+                        <p style={{ marginTop: '10px', marginBottom: "10px" }}>
+                            {"Deletes all Records and resets the Database"}
+                        </p>
+                        <button
+                            className={styles.button}
+                            style={{ marginTop: '10px', marginBottom: "10px" }}
+                            onClick={e => submitDeleteAllRecords(e)}
+                        >
+                            Delete All Records
+                        </button>
+
+
+                    </div>
                 </main>
             );
         }
