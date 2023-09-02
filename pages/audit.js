@@ -87,6 +87,17 @@ export default function Audit({ params }) {
     const columns = useMemo(
         () => [
             {
+                Header: 'Status',
+                columns: [
+                    {
+                        Header: 'Status',
+                        accessor: 'status',
+                        Filter: SelectColumnFilter,
+                        filter: 'includes',
+                    },
+                ],
+            },
+            {
                 Header: 'ID',
                 columns: [
                     {
@@ -264,7 +275,7 @@ export default function Audit({ params }) {
                     let records = await records_res.json();
 
                     console.log("Setting All Applicant Records");
-                    console.log(records);
+                    // console.log(records);
                     setAllRecords(records.result);
                 } else {
                     setAllRecords([]);

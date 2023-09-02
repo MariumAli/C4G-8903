@@ -60,7 +60,7 @@ export default function ConfirmationPage({ params }) {
                     let records = await records_res.json();
 
                     console.log("Setting Similar Records");
-                    console.log(records);
+                    // console.log(records);
                     setSimilarRecordsResponse(records.result);
 
                     // parse out household members from query parameters
@@ -168,6 +168,12 @@ export default function ConfirmationPage({ params }) {
         setConfirmRejectState("Rejected");
     }
 
+    async function processFurtherInfo() {
+        setConfirmRejectPressed(true);
+        setConfirmRejectState("Pending");
+        // TODO: Send Email
+    }
+
     if (status != "authenticated") {
         return (
             <main className={styles.main}>
@@ -183,7 +189,7 @@ export default function ConfirmationPage({ params }) {
             </main>
         )
     }
-    if (!["agent", "admin"].includes(userRole)) {
+    if (!["agent", "agent-admin", "admin"].includes(userRole)) {
         return (
             <main className={styles.main}>
                 <h1>Insufficient Privileges</h1>
@@ -353,6 +359,9 @@ export default function ConfirmationPage({ params }) {
                     </button>
                     <button className={styles.button} style={{marginLeft: '5px', marginRight: '5px', marginTop: "15px", marginBottom: "5px"}} onClick={() => processReject()}>
                         Reject
+                    </button>
+                    <button className={styles.button} style={{marginLeft: '5px', marginRight: '5px', marginTop: "15px", marginBottom: "5px"}} onClick={() => processFurtherInfo()}>
+                        Ask for further Information
                     </button>
                 </div>
             </main>

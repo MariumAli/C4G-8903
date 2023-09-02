@@ -72,7 +72,7 @@ export default function Users({ params }) {
 
                     console.log(`Role for ${session.user.email}: `, res_json);
 
-                    if (res_json.hasOwnProperty('result')) {
+                    if (res_json.hasOwnProperty('result') && res_json["result"] != "invalid") {
                         setUserRole(res_json["result"]);
                     }
                 }
@@ -198,7 +198,8 @@ export default function Users({ params }) {
                 },
             );
             let res_json = await res.json();
-            console.log(`add user call response status: ${res.status}`);
+            console.log(res);
+            console.log(`Add user call response status: ${res.status}`);
             alert(res_json.result);
         } else {
             alert("An error has occurred in parsing this form, please refresh the page.");
@@ -260,6 +261,7 @@ export default function Users({ params }) {
                                         <select type="text" name="role" style={{ width: '100%' }} onChange={handleAddUserInput} value={addUserFormData.role} >
                                             <option value=""></option>
                                             <option value="agent">agent</option>
+                                            <option value="admin-agent">admin-agent</option>
                                             <option value="admin">admin</option>
                                         </select>
                                     </span>

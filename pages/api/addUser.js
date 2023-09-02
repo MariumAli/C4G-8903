@@ -14,10 +14,10 @@ function normalizeEmail(email) {
 function normalizeRole(role) {
     let normalizedRole = role.trim().toLowerCase();
 
-    if ((normalizedRole === "admin") || (normalizedRole === "agent")) {
+    if ((normalizedRole === "admin") || (normalizedRole === "agent") || (normalizedRole == "admin-agent")) {
         return normalizedRole;
     } else {
-        throw new Error("Role must be one of 'agent' or 'admin'.");
+        throw new Error("Role must be one of 'agent', 'admin-agent' or 'admin'.");
     }
 }
 
@@ -59,14 +59,14 @@ export default async function handler(req, res) {
             {
 
                 query: 'INSERT INTO Users (email, role) VALUES (?, ?)',
-                values: [normalizedEmail, normalizedRole]
+                values: [req.query.email, req.query.role]
             }
         );
 
         if (db_result.hasOwnProperty("error"))  {
             res.status(400).json({ result: `Internal server error, failed to add user to remote database.`})
         } else {
-            res.status(200).json({ result: `Added '${normalizedRole}' user with email: '${normalizedEmail}'.`})
+            res.status(200).json({ result: `Added '${req.query.role}' user with email: '${req.query.email}'.`})
         }
     } catch ( error ) {
         console.log(error);

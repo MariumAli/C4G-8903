@@ -169,7 +169,7 @@ export default function Table({ columns, data }) {
                     ))}
                 </select>
             </div>
-            <div>
+            {/* <div>
                 <pre>
                     <code>{console.log(JSON.stringify(filters, null, 2))}</code>
                     <code>
@@ -186,7 +186,7 @@ export default function Table({ columns, data }) {
                         ))}
                     </code>
                 </pre>
-            </div>
+            </div> */}
         </>
     )
 }
