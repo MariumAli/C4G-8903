@@ -128,7 +128,7 @@ export default function Contact() {
             </main>
         )
     }
-    if (!["agent", "admin"].includes(userRole)) {
+    if (!["agent", "admin-agent", "admin"].includes(userRole)) {
         return (
             <main className={styles.main}>
                 <h1>Insufficient Privileges</h1>

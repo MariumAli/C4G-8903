@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             const db_result = await executeQuery(
                 {
                     query: "DELETE FROM Users WHERE `Users`.`email` = ?",
-                    values: [normalizeEmail(req.query.email)]
+                    values: [req.query.email]
                 }
             );
 

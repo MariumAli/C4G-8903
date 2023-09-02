@@ -266,7 +266,7 @@ export default function AdminActions({ params }) {
                     let records = await records_res.json();
 
                     console.log("Setting All Applicant Records");
-                    console.log(records);
+                    // console.log(records);
                     setAllRecords(records.result);
                 } else {
                     setAllRecords([]);
@@ -366,7 +366,7 @@ export default function AdminActions({ params }) {
                 <main className={styles.auditmain}>
                     <h1>Admin - Pending Applications</h1>
                     <div className={styles.container} style={{ width: '30%', minWidth: "250px" }}>
-                        <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Remove Record</h2>
+                        <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Remove a Single Record</h2>
                         <p style={{ marginTop: '10px', marginBottom: "10px" }}>
                             {"Remove a record (equivalent to a row in the table below) by it's \"ApplicationID\" field."}
                         </p>
@@ -390,7 +390,7 @@ export default function AdminActions({ params }) {
                             {"Download all Records to an Excel file"}
                         </p>
                         {/* Export Button Start */}
-                        <CSVLink id="download-records-form" filename="records.csv"
+                        <CSVLink id="download-records-form" filename={`records-${new Date().toDateString()}.csv`}
                             data={allRecords}
                             className={styles.button}
                             style={{ marginTop: '10px', marginBottom: "10px" }}>
