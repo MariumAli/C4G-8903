@@ -161,17 +161,40 @@ export default function ConfirmationPage({ params }) {
         setAddRecordSuccess(addRecordSuccessValue);
 
         console.log(`Submitted, Success: ${addRecordSuccessValue}`);
+
+        // trigger email notification
+        let res = await fetch(
+            `/api/mailAgent`,
+            {
+                method: "POST",
+            },
+        );
     }
 
     async function processReject() {
         setConfirmRejectPressed(true);
         setConfirmRejectState("Rejected");
+
+        // trigger email notification
+        let res = await fetch(
+            `/api/mailAgent`,
+            {
+                method: "POST",
+            },
+        );
     }
 
     async function processFurtherInfo() {
         setConfirmRejectPressed(true);
         setConfirmRejectState("Pending");
-        // TODO: Send Email
+        
+        // trigger email notification
+        let res = await fetch(
+            `/api/mailAgent`,
+            {
+                method: "POST",
+            },
+        );
     }
 
     if (status != "authenticated") {

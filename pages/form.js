@@ -102,6 +102,14 @@ export default function Contact() {
             }
         }
 
+        // trigger email notification
+        let res = await fetch(
+        	`/api/mailAdmin`,
+            {
+                method: "POST",
+            },
+        );
+
         // POST the data to the URL of the form
         console.log('Sending form data: ', data);
         console.log('with household members: ', householdMembers);
@@ -403,7 +411,7 @@ export default function Contact() {
                                 <button className={styles.button} style={{marginLeft: 'auto', marginRight: 'auto', marginTop: "5px", marginBottom: "5px"}} onClick={() => addMember()}>Add</button>
                             </div>
 
-                            <button className={styles.button} style={{ marginTop: '10px', marginBottom: "10px" }} type="submit">Process Information</button>
+                            <button className={styles.button} style={{ marginTop: '10px', marginBottom: "10px" }} type="submit" >Process Information</button>
                         </form>
                 }
             </div >
