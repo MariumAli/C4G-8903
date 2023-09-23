@@ -244,6 +244,19 @@ export default function Audit({ params }) {
                     },
                 ],
             },
+            {
+                Header: 'Request Information',
+                columns: [
+                    {
+                        Header: 'Requestor Email',
+                        accessor: 'RequestorEmail',
+                    },
+                    {
+                        Header: 'Request Status',
+                        accessor: 'Status',
+                    },
+                ],
+            },
         ],
         []
     )
