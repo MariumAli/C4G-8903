@@ -145,6 +145,8 @@ export default function ConfirmationPage({ params }) {
                 + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
                 + `&monthlyWater=${data.monthlyWater}`
                 + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
+                + `&status=Approved`
+                + `&requestorEmail=${session.user.email}`
                 ,
                 {
                     method: "POST",
@@ -172,8 +174,55 @@ export default function ConfirmationPage({ params }) {
     }
 
     async function processReject() {
+        var addRecordSuccessValue = false;
+        if (router.isReady) {
+            let add_res = await fetch(
+                `/api/addApplication?applicantDOB=${data.applicantDOB}`
+                + `&applicantFirstName=${data.applicantFirstName}`
+                + `&applicantLastName=${data.applicantLastName}`
+                + `&applicantMiddleName=${data.applicantMiddleName}`
+                + `&applicantStreetAddress=${data.applicantStreetAddress}`
+                + `&applicantCity=${data.applicantCity}`
+                + `&applicantPostalCode=${data.applicantPostalCode}`
+                + `&applicantCountry=${data.applicantCountry}`
+                + `&lroNumber=${data.lroNumber}`
+                + `&agencyName=${data.agencyName}`
+                + `&lroEmail=${data.lroEmail}`
+                + `&fundingPhase=${data.fundingPhase}`
+                + `&jurisdiction=${data.jurisdiction}`
+                + `&paymentVendor=${data.paymentVendor}`
+                + `&monthlyRent=${data.monthlyRent}`
+                + `&monthlyRentLRO=${data.monthlyRentLRO}`
+                + `&monthlyMortgage=${data.monthlyMortgage}`
+                + `&monthlyMortgageLRO=${data.monthlyMortgageLRO}`
+                + `&lodgingNightCost=${data.lodgingNightCost}`
+                + `&lodgingNightCount=${data.lodgingNightCount}`
+                + `&lodgingNightCostLRO=${data.lodgingNightCostLRO}`
+                + `&monthlyGas=${data.monthlyGas}`
+                + `&monthlyGasLRO=${data.monthlyGasLRO}`
+                + `&monthlyElectric=${data.monthlyElectric}`
+                + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
+                + `&monthlyWater=${data.monthlyWater}`
+                + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
+                + `&status=Rejected`
+                + `&requestorEmail=${session.user.email}`
+                ,
+                {
+                    method: "POST",
+                    headers: {
+                        "accept": "application/json",
+                    },
+                },
+            );
+            let records = await add_res.json();
+            addRecordSuccessValue = records.result[0].success;
+        }
+
         setConfirmRejectPressed(true);
         setConfirmRejectState("Rejected");
+        setAddRecordSuccess(addRecordSuccessValue);
+
+        console.log(`Submitted, Success: ${addRecordSuccessValue}`);
 
         // trigger email notification
         let res = await fetch(
@@ -185,9 +234,57 @@ export default function ConfirmationPage({ params }) {
     }
 
     async function processFurtherInfo() {
+        var addRecordSuccessValue = false;
+        if (router.isReady) {
+            let add_res = await fetch(
+                `/api/addApplication?applicantDOB=${data.applicantDOB}`
+                + `&applicantFirstName=${data.applicantFirstName}`
+                + `&applicantLastName=${data.applicantLastName}`
+                + `&applicantMiddleName=${data.applicantMiddleName}`
+                + `&applicantStreetAddress=${data.applicantStreetAddress}`
+                + `&applicantCity=${data.applicantCity}`
+                + `&applicantPostalCode=${data.applicantPostalCode}`
+                + `&applicantCountry=${data.applicantCountry}`
+                + `&lroNumber=${data.lroNumber}`
+                + `&agencyName=${data.agencyName}`
+                + `&lroEmail=${data.lroEmail}`
+                + `&fundingPhase=${data.fundingPhase}`
+                + `&jurisdiction=${data.jurisdiction}`
+                + `&paymentVendor=${data.paymentVendor}`
+                + `&monthlyRent=${data.monthlyRent}`
+                + `&monthlyRentLRO=${data.monthlyRentLRO}`
+                + `&monthlyMortgage=${data.monthlyMortgage}`
+                + `&monthlyMortgageLRO=${data.monthlyMortgageLRO}`
+                + `&lodgingNightCost=${data.lodgingNightCost}`
+                + `&lodgingNightCount=${data.lodgingNightCount}`
+                + `&lodgingNightCostLRO=${data.lodgingNightCostLRO}`
+                + `&monthlyGas=${data.monthlyGas}`
+                + `&monthlyGasLRO=${data.monthlyGasLRO}`
+                + `&monthlyElectric=${data.monthlyElectric}`
+                + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
+                + `&monthlyWater=${data.monthlyWater}`
+                + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
+                + `&status=Pending`
+                + `&requestorEmail=${session.user.email}`
+                ,
+                {
+                    method: "POST",
+                    headers: {
+                        "accept": "application/json",
+                    },
+                },
+            );
+            let records = await add_res.json();
+            addRecordSuccessValue = records.result[0].success;
+        }
+
         setConfirmRejectPressed(true);
         setConfirmRejectState("Pending");
         
+        setAddRecordSuccess(addRecordSuccessValue);
+
+        console.log(`Submitted, Success: ${addRecordSuccessValue}`);
+
         // trigger email notification
         let res = await fetch(
             `/api/mailAgent`,
