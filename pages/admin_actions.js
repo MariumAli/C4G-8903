@@ -243,8 +243,12 @@ export default function AdminActions({ params }) {
                         accessor: 'RequestorEmail',
                     },
                     {
-                        Header: 'Request Status',
+                        Header: 'Status',
                         accessor: 'Status',
+                    },
+                    {
+                        Header: 'Status Comments',
+                        accessor: 'StatusComments',
                     },
                 ],
             },
