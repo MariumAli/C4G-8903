@@ -10,7 +10,7 @@ export default async function handler(req, res) {
                          + 'Country, LRONumber, LROAgencyName, LROEmail, FundingPhase, Jurisdiction, PaymentVendor, MonthlyRentAmt, '
                          + 'MonthyRentAmt_LRO, MonthlyMortgageAmt, MonthlyMortgageAmt_LRO, LodgingCostPerNight, LodgingNightCount, '
                          + 'LodgingCostPerNight_LRO, MonthlyGasAmt, MonthlyGasAmt_LRO, MonthlyElectricityAmt, MonthlyElectricityAmt_LRO, '
-                         + 'MonthlyWaterAmt, MonthlyWaterAmt_LRO, Status, RequestorEmail '
+                         + 'MonthlyWaterAmt, MonthlyWaterAmt_LRO, Status, StatusComments, RequestorEmail '
                          + 'from Application_Applicant_LRO'
             }
         );

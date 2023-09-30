@@ -16,6 +16,10 @@ export default function ConfirmationPage({ params }) {
     const [addRecordSuccess, setAddRecordSuccess] = useState(false);
     const [userRole, setUserRole] = useState("invalid");
 
+    const [formData, setFormData] = useState({
+        statusComments: "",
+    });
+
     useEffect(
         () => {
             async function fetchUserRole() {
@@ -113,6 +117,16 @@ export default function ConfirmationPage({ params }) {
         [router.isReady, data]
     );
 
+    const handleInput = (e) => {
+        const fieldName = e.target.name;
+        const fieldValue = e.target.value;
+
+        setFormData((prevState) => ({
+            ...prevState,
+            [fieldName]: fieldValue
+        }));
+    }
+
     // TODO: add an alert when a request is approved
     async function addApplication() {
         var addRecordSuccessValue = false;
@@ -147,6 +161,7 @@ export default function ConfirmationPage({ params }) {
                 + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
                 + `&status=Approved`
                 + `&requestorEmail=${session.user.email}`
+                + `&statusComments=${formData.statusComments}`
                 ,
                 {
                     method: "POST",
@@ -206,6 +221,7 @@ export default function ConfirmationPage({ params }) {
                 + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
                 + `&status=Rejected`
                 + `&requestorEmail=${session.user.email}`
+                + `&statusComments=${formData.statusComments}`
                 ,
                 {
                     method: "POST",
@@ -266,6 +282,7 @@ export default function ConfirmationPage({ params }) {
                 + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
                 + `&status=Pending`
                 + `&requestorEmail=${session.user.email}`
+                + `&statusComments=${formData.statusComments}`
                 ,
                 {
                     method: "POST",
@@ -473,6 +490,12 @@ export default function ConfirmationPage({ params }) {
                     }
                 </div>
                 <br></br>
+                <div className={styles.container}>
+                	<label className={styles.required}>Comments: </label>
+                	<span style={{overflow: "hidden", marginTop: "5px" }}>
+                		<input type="text" required={true} name="statusComments" style={{ width: '100%' }} onChange={handleInput} value={formData.statusComments} />
+                	</span>
+                </div>
                 <div style={{display: "flex"}}>
                     <button className={styles.button} style={{marginLeft: '5px', marginRight: '5px', marginTop: "15px", marginBottom: "5px"}} onClick={() => addApplication()}>
                         Accept
