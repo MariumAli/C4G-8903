@@ -38,7 +38,7 @@ export default function SimpleResponsiveTable({ allRecords }) {
 
 
         return filteredData;
-    }, [allRecords, filterEmailValue]);
+    }, [allRecords, filterEmailValue, hasEmailSearchFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -128,15 +128,15 @@ export default function SimpleResponsiveTable({ allRecords }) {
         onRowsPerPageChange,
         allRecords.length,
         onEmailSearchChange,
-        hasEmailSearchFilter,
+        onEmailClear,
     ]);
 
     const bottomContent = React.useMemo(() => {
         return (
             <div className="py-2 px-2 flex justify-between items-center">
-            <span className="w-[30%] text-small text-default-400">
-                {`${allRecords.length} User records available`}
-            </span>
+                <span className="w-[30%] text-small text-default-400">
+                    {`${allRecords.length} User records available`}
+                </span>
                 <Pagination
                     isCompact
                     showControls
@@ -156,7 +156,7 @@ export default function SimpleResponsiveTable({ allRecords }) {
                 </div>
             </div>
         );
-    }, [items.length, page, pages, hasEmailSearchFilter]);
+    }, [page, pages, allRecords.length, onNextPage, onPreviousPage]);
 
 
 
@@ -192,7 +192,7 @@ export default function SimpleResponsiveTable({ allRecords }) {
                         <TableRow key={idx}>
                             {
                                 Object.values(item).map((value) => {
-                                    return (<TableCell>{value}</TableCell>)
+                                    return (<TableCell key={`${idx}-${value}`}>{value}</TableCell>)
                                 })
                             }
                         </TableRow>

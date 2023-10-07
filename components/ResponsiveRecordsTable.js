@@ -45,11 +45,10 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete }) {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-
-    const handleOpen = (record) => {
+    const handleOpen = React.useCallback((record) => {
         setOpenedRow(record);
         onOpen();
-    };
+    }, [onOpen]);
 
     const [page, setPage] = React.useState(1);
 
@@ -86,7 +85,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete }) {
 
 
         return filteredData;
-    }, [allRecords, filterValue, filterEmailValue, statusFilter]);
+    }, [allRecords, filterValue, filterEmailValue, statusFilter, hasEmailSearchFilter, hasSearchFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -180,7 +179,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete }) {
                     </div>
                 );
         }
-    }, []);
+    }, [handleOpen, onDelete, onUpdate]);
 
     const onNextPage = React.useCallback(() => {
         if (page < pages) {
@@ -322,8 +321,10 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete }) {
         onRowsPerPageChange,
         allRecords.length,
         onSearchChange,
-        hasSearchFilter,
-        hasEmailSearchFilter,
+        onClear,
+        onEmailClear,
+        onEmailSearchChange,
+        router
     ]);
 
     const bottomContent = React.useMemo(() => {
@@ -353,7 +354,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete }) {
                 </div>
             </div>
         );
-    }, [selectedKeys, items.length, page, pages, hasSearchFilter, hasEmailSearchFilter]);
+    }, [selectedKeys, page, pages, filteredItems.length, onNextPage, onPreviousPage]);
 
     return (
         <div>
