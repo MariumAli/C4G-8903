@@ -26,6 +26,7 @@
     "next-absolute-url": "latest",
     "next-auth": "latest",
     "next-pwa": "latest",
+    "nodemailer": "^6.9.5",
     "react": "latest",
     "react-csv": "^2.2.2",
     "react-dom": "18.2.0",

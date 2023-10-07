@@ -16,6 +16,10 @@ export default function ConfirmationPage({ params }) {
     const [addRecordSuccess, setAddRecordSuccess] = useState(false);
     const [userRole, setUserRole] = useState("invalid");
 
+    const [formData, setFormData] = useState({
+        statusComments: "",
+    });
+
     useEffect(
         () => {
             async function fetchUserRole() {
@@ -167,15 +171,113 @@ export default function ConfirmationPage({ params }) {
         setAddRecordSuccess(addRecordSuccessValue);
 
         console.log(`Submitted, Success: ${addRecordSuccessValue}`);
+
+        // trigger email notification
+        let res = await fetch(
+            `/api/mailAgent`,
+            {
+                method: "POST",
+            },
+        );
     }
 
     async function processReject() {
+        var addRecordSuccessValue = false;
+        if (router.isReady) {
+            let add_res = await fetch(
+                `/api/addApplication?applicantDOB=${data.applicantDOB}`
+                + `&applicantFirstName=${data.applicantFirstName}`
+                + `&applicantLastName=${data.applicantLastName}`
+                + `&applicantMiddleName=${data.applicantMiddleName}`
+                + `&applicantStreetAddress=${data.applicantStreetAddress}`
+                + `&applicantCity=${data.applicantCity}`
+                + `&applicantPostalCode=${data.applicantPostalCode}`
+                + `&applicantCountry=${data.applicantCountry}`
+                + `&lroNumber=${data.lroNumber}`
+                + `&agencyName=${data.agencyName}`
+                + `&lroEmail=${data.lroEmail}`
+                + `&fundingPhase=${data.fundingPhase}`
+                + `&jurisdiction=${data.jurisdiction}`
+                + `&paymentVendor=${data.paymentVendor}`
+                + `&monthlyRent=${data.monthlyRent}`
+                + `&monthlyRentLRO=${data.monthlyRentLRO}`
+                + `&monthlyMortgage=${data.monthlyMortgage}`
+                + `&monthlyMortgageLRO=${data.monthlyMortgageLRO}`
+                + `&lodgingNightCost=${data.lodgingNightCost}`
+                + `&lodgingNightCount=${data.lodgingNightCount}`
+                + `&lodgingNightCostLRO=${data.lodgingNightCostLRO}`
+                + `&monthlyGas=${data.monthlyGas}`
+                + `&monthlyGasLRO=${data.monthlyGasLRO}`
+                + `&monthlyElectric=${data.monthlyElectric}`
+                + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
+                + `&monthlyWater=${data.monthlyWater}`
+                + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
+                + `&status=Rejected`
+                + `&requestorEmail=${session.user.email}`
+                + `&statusComments=${formData.statusComments}`
+                ,
+                {
+                    method: "POST",
+                    headers: {
+                        "accept": "application/json",
+                    },
+                },
+            );
+            let records = await add_res.json();
+            addRecordSuccessValue = records.result[0].success;
+        }
+
         setConfirmRejectPressed(true);
          setApplicationStatus("Rejected");
         addApplication("Rejected");
     }
 
     async function processFurtherInfo() {
+        var addRecordSuccessValue = false;
+        if (router.isReady) {
+            let add_res = await fetch(
+                `/api/addApplication?applicantDOB=${data.applicantDOB}`
+                + `&applicantFirstName=${data.applicantFirstName}`
+                + `&applicantLastName=${data.applicantLastName}`
+                + `&applicantMiddleName=${data.applicantMiddleName}`
+                + `&applicantStreetAddress=${data.applicantStreetAddress}`
+                + `&applicantCity=${data.applicantCity}`
+                + `&applicantPostalCode=${data.applicantPostalCode}`
+                + `&applicantCountry=${data.applicantCountry}`
+                + `&lroNumber=${data.lroNumber}`
+                + `&agencyName=${data.agencyName}`
+                + `&lroEmail=${data.lroEmail}`
+                + `&fundingPhase=${data.fundingPhase}`
+                + `&jurisdiction=${data.jurisdiction}`
+                + `&paymentVendor=${data.paymentVendor}`
+                + `&monthlyRent=${data.monthlyRent}`
+                + `&monthlyRentLRO=${data.monthlyRentLRO}`
+                + `&monthlyMortgage=${data.monthlyMortgage}`
+                + `&monthlyMortgageLRO=${data.monthlyMortgageLRO}`
+                + `&lodgingNightCost=${data.lodgingNightCost}`
+                + `&lodgingNightCount=${data.lodgingNightCount}`
+                + `&lodgingNightCostLRO=${data.lodgingNightCostLRO}`
+                + `&monthlyGas=${data.monthlyGas}`
+                + `&monthlyGasLRO=${data.monthlyGasLRO}`
+                + `&monthlyElectric=${data.monthlyElectric}`
+                + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
+                + `&monthlyWater=${data.monthlyWater}`
+                + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
+                + `&status=Pending`
+                + `&requestorEmail=${session.user.email}`
+                + `&statusComments=${formData.statusComments}`
+                ,
+                {
+                    method: "POST",
+                    headers: {
+                        "accept": "application/json",
+                    },
+                },
+            );
+            let records = await add_res.json();
+            addRecordSuccessValue = records.result[0].success;
+        }
+
         setConfirmRejectPressed(true);
          setApplicationStatus("Pending");
         // TODO: Send Email
@@ -361,6 +463,12 @@ export default function ConfirmationPage({ params }) {
                     }
                 </div>
                 <br></br>
+                <div className={styles.container}>
+                	<label className={styles.required}>Comments: </label>
+                	<span style={{overflow: "hidden", marginTop: "5px" }}>
+                		<input type="text" required={true} name="statusComments" style={{ width: '100%' }} onChange={handleInput} value={formData.statusComments} />
+                	</span>
+                </div>
                 <div style={{display: "flex"}}>
                     <button className={styles.button} style={{marginLeft: '5px', marginRight: '5px', marginTop: "15px", marginBottom: "5px"}} onClick={() => processApprove()}>
                         Accept

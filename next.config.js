@@ -12,6 +12,8 @@ const nextConfig = {
     'MYSQL_DATABASE': 'unitedwayatlantaefsp',
     'MYSQL_USER': 'efsp_mngr',
     'MYSQL_PASSWORD':'TKL72wvu$',
+    'NODEMAILER_EMAIL': 'c4g.efsp.main@gmail.com',
+	  'NODEMAILER_PW': 'wjmfdwkkospweksp',
   },
   devIndicators: {
     autoPrerender: false,
