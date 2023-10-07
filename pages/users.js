@@ -1,57 +1,15 @@
 import styles from '@/styles/Home.module.css'
-import styled from 'styled-components'
 import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from 'next/router';
-import Table from '@/components/Table';
+import SimpleResponsiveTable from '@/components/SimpleResponsiveTable';
+import { userColumns } from "@/data";
 
-const Styles = styled.div`
-  padding: 1rem;
-  flex-direction: left;
-
-  div {
-    button {
-        font-size:10 rem;
-        padding: 0.5rem;
-        margin-bottom: 2rem;
-        align-items: right;
-    }
-  }
-  table {
-    border-spacing: 0;
-    border: 1px solid black;
-
-    tr {
-      :last-child {
-        td {
-          border-bottom: 0;
-        }
-      }
-    }
-
-    th,
-    td {
-      margin: 0;
-      padding: 0.5rem;
-      border-bottom: 1px solid black;
-      border-right: 1px solid black;
-
-      :last-child {
-        border-right: 0;
-      }
-    }
-  }
-
-  .pagination {
-    padding: 0.5rem;
-  }
-`
 
 export default function Users({ params }) {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [allUsers, setAllUsers] = useState([]);
-    const [removeUserFormData, setRemoveUserFormData] = useState([]);
     const [addUserFormData, setAddUserFormData] = useState([]);
     const [userRole, setUserRole] = useState("invalid");
 
@@ -120,42 +78,11 @@ export default function Users({ params }) {
         [router.isReady]
     );
 
-    const userColumns = React.useMemo(
-        () => [
-            {
-                Header: 'Registered Users',
-                columns: [
-                    {
-                        Header: 'Email',
-                        accessor: 'email',
-                    },
-                    {
-                        Header: 'Role',
-                        accessor: 'role',
-                    },
-                ],
-            },
-        ],
-        []
-    )
 
-    const handleRemoveUserInput = (e) => {
-        const fieldName = e.target.name;
-        const fieldValue = e.target.value;
-
-        setRemoveUserFormData((prevState) => ({
-            ...prevState,
-            [fieldName]: fieldValue
-        }));
-    }
-
-    const submitRemoveUserForm = async (e) => {
-        // We don't want the page to refresh
-        e.preventDefault();
-
-        if (removeUserFormData.hasOwnProperty("email")) {
+    async function submitRemoveUserForm(user) {
+        if (user.email) {
             let res = await fetch(
-                `/api/removeUser?email=${removeUserFormData.email}`,
+                `/api/removeUser?email=${user.email}`,
                 {
                     method: "GET",
                     headers: {
@@ -269,26 +196,11 @@ export default function Users({ params }) {
                                 <button className={styles.button} style={{ marginTop: '10px', marginBottom: "10px" }} type="submit">Submit</button>
                             </form>
                         </div>
-                        <div className={styles.container} style={{ width: '30%', minWidth: "250px" }}>
-                            <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Remove User</h2>
-                            <p style={{ marginTop: '10px', marginBottom: "10px" }}>
-                                {"Remove a user via the email address."}
-                            </p>
-                            <form id="remove-user-form" onSubmit={submitRemoveUserForm} style={{ overflow: 'hidden' }}>
-                                <div className={styles.container}>
-                                    <label className={styles.required}>User Email: </label>
-                                    <span style={{ display: "block", overflow: "hidden", marginTop: "5px" }}>
-                                        <input type="email" required={true} name="email" style={{ width: '100%' }} onChange={handleRemoveUserInput} value={removeUserFormData.email}/>
-                                    </span>
-                                </div>
-                                <button className={styles.button} style={{ marginTop: '10px', marginBottom: "10px" }} type="submit">Submit</button>
-                            </form>
-                        </div>
                     </div>
                     <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Explore Users</h2>
-                    <Styles>
-                        <Table columns={userColumns} data={allUsers} />
-                    </Styles>
+
+                    <SimpleResponsiveTable allRecords={allUsers} 
+                    onDelete={submitRemoveUserForm}/>
                 </main>
             );
         }

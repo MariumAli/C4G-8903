@@ -4,6 +4,7 @@ const withPWA = require('next-pwa')({
   dest: 'public'
 })
 
+
 const nextConfig = {
   reactStrictMode: true,
   env: {
@@ -11,9 +12,10 @@ const nextConfig = {
     'MYSQL_DATABASE': 'unitedwayatlantaefsp',
     'MYSQL_USER': 'efsp_mngr',
     'MYSQL_PASSWORD':'TKL72wvu$',
-  }
+  },
+  devIndicators: {
+    autoPrerender: false,
+  },
 }
 
-module.exports = withPWA(
-  nextConfig,
-)
+module.exports = process.env.NODE_ENV === 'development' ? nextConfig : withPWA(nextConfig);

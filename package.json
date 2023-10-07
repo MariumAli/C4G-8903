@@ -9,19 +9,33 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "13.1.6",
-    "eslint": "8.32.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.14.12",
+    "@mui/material": "^5.14.12",
+    "@mui/styled-engine-sc": "^5.14.12",
+    "@next/font": "latest",
+    "@nextui-org/react": "latest",
+    "@nextui-org/table": "latest",
+    "esbuild-wasm": "0.17.12",
+    "eslint": "latest",
     "eslint-config-next": "13.1.6",
     "match-sorter": "^6.3.1",
-    "next": "13.1.6",
-    "next-absolute-url": "^1.2.2",
-    "next-auth": "^4.19.2",
-    "next-pwa": "^5.6.0",
-    "react": "18.2.0",
+    "next": "latest",
+    "next-absolute-url": "latest",
+    "next-auth": "latest",
+    "next-pwa": "latest",
+    "react": "latest",
     "react-csv": "^2.2.2",
     "react-dom": "18.2.0",
     "react-table": "^7.8.0",
     "serverless-mysql": "^1.5.4",
-    "styled-components": "^5.3.9"
+    "styled-components": "^5.3.11"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.3"
   }
 }
