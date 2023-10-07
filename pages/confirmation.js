@@ -12,7 +12,7 @@ export default function ConfirmationPage({ params }) {
     const [similarRecordsResponse, setSimilarRecordsResponse] = useState([]);
     const [householdMemberSimilarRecords, setHouseholdMemberSimilarRecords] = useState([]);
     const [confirmRejectPressed, setConfirmRejectPressed] = useState(false);
-    const [confirmRejectState, setConfirmRejectState] = useState(null);
+    const [applicationStatus,  setApplicationStatus] = useState('');
     const [addRecordSuccess, setAddRecordSuccess] = useState(false);
     const [userRole, setUserRole] = useState("invalid");
 
@@ -117,18 +117,14 @@ export default function ConfirmationPage({ params }) {
         [router.isReady, data]
     );
 
-    const handleInput = (e) => {
-        const fieldName = e.target.name;
-        const fieldValue = e.target.value;
-
-        setFormData((prevState) => ({
-            ...prevState,
-            [fieldName]: fieldValue
-        }));
+    const processApprove = () => {
+        setConfirmRejectPressed(true);
+         setApplicationStatus("Approved");
+        addApplication("Approved");
     }
 
     // TODO: add an alert when a request is approved
-    async function addApplication() {
+    async function addApplication(appStatus) {
         var addRecordSuccessValue = false;
         if (router.isReady) {
             let add_res = await fetch(
@@ -159,9 +155,8 @@ export default function ConfirmationPage({ params }) {
                 + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
                 + `&monthlyWater=${data.monthlyWater}`
                 + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
-                + `&status=Approved`
-                + `&requestorEmail=${session.user.email}`
-                + `&statusComments=${formData.statusComments}`
+                + `&RequestorEmail=${session.user.email}`
+                + `&Status=${appStatus}`
                 ,
                 {
                     method: "POST",
@@ -173,8 +168,6 @@ export default function ConfirmationPage({ params }) {
             let records = await add_res.json();
             addRecordSuccessValue = records.result[0].success;
         }
-        setConfirmRejectPressed(true);
-        setConfirmRejectState("Confirmed");
         setAddRecordSuccess(addRecordSuccessValue);
 
         console.log(`Submitted, Success: ${addRecordSuccessValue}`);
@@ -235,18 +228,8 @@ export default function ConfirmationPage({ params }) {
         }
 
         setConfirmRejectPressed(true);
-        setConfirmRejectState("Rejected");
-        setAddRecordSuccess(addRecordSuccessValue);
-
-        console.log(`Submitted, Success: ${addRecordSuccessValue}`);
-
-        // trigger email notification
-        let res = await fetch(
-            `/api/mailAgent`,
-            {
-                method: "POST",
-            },
-        );
+         setApplicationStatus("Rejected");
+        addApplication("Rejected");
     }
 
     async function processFurtherInfo() {
@@ -296,19 +279,9 @@ export default function ConfirmationPage({ params }) {
         }
 
         setConfirmRejectPressed(true);
-        setConfirmRejectState("Pending");
-        
-        setAddRecordSuccess(addRecordSuccessValue);
-
-        console.log(`Submitted, Success: ${addRecordSuccessValue}`);
-
-        // trigger email notification
-        let res = await fetch(
-            `/api/mailAgent`,
-            {
-                method: "POST",
-            },
-        );
+         setApplicationStatus("Pending");
+        // TODO: Send Email
+        addApplication("Pending");
     }
 
     if (status != "authenticated") {
@@ -347,7 +320,7 @@ export default function ConfirmationPage({ params }) {
             <main className={styles.main}>
                 <h1>Form Confirmation</h1>
                 <p style={{marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px"}}>
-                    {`Application Status: ${confirmRejectState}`}
+                    {`Application Status: ${applicationStatus}`}
                 </p>
                 <br></br>
                 <button className={styles.button} style={{marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px"}} onClick={() => router.push('/')}>
@@ -497,7 +470,7 @@ export default function ConfirmationPage({ params }) {
                 	</span>
                 </div>
                 <div style={{display: "flex"}}>
-                    <button className={styles.button} style={{marginLeft: '5px', marginRight: '5px', marginTop: "15px", marginBottom: "5px"}} onClick={() => addApplication()}>
+                    <button className={styles.button} style={{marginLeft: '5px', marginRight: '5px', marginTop: "15px", marginBottom: "5px"}} onClick={() => processApprove()}>
                         Accept
                     </button>
                     <button className={styles.button} style={{marginLeft: '5px', marginRight: '5px', marginTop: "15px", marginBottom: "5px"}} onClick={() => processReject()}>

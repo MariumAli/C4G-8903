@@ -15,8 +15,8 @@ export default async function handler(req, res) {
                          + 'Country, LRONumber, LROAgencyName, LROEmail, FundingPhase, Jurisdiction, PaymentVendor, MonthlyRentAmt, '
                          + 'MonthyRentAmt_LRO, MonthlyMortgageAmt, MonthlyMortgageAmt_LRO, LodgingCostPerNight, LodgingNightCount, '
                          + 'LodgingCostPerNight_LRO, MonthlyGasAmt, MonthlyGasAmt_LRO, MonthlyElectricityAmt, MonthlyElectricityAmt_LRO, '
-                         + 'MonthlyWaterAmt, MonthlyWaterAmt_LRO, Status, StatusComments, RequestorEmail) '
-                         + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                         + 'MonthlyWaterAmt, MonthlyWaterAmt_LRO, RequestorEmail, Status) '
+                         + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 values: [req.query.applicantDOB,
                         req.query.applicantFirstName,
                         req.query.applicantLastName,
@@ -44,9 +44,8 @@ export default async function handler(req, res) {
                         req.query.monthlyElectricLRO,
                         req.query.monthlyWater,
                         req.query.monthlyWaterLRO,
-                        req.query.status,
-                        req.query.statusComments,
-                        req.query.requestorEmail
+                        req.query.RequestorEmail,
+                        req.query.Status
                 ]
             }
         );
