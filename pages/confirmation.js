@@ -123,6 +123,16 @@ export default function ConfirmationPage({ params }) {
         addApplication("Approved");
     }
 
+    const handleInput = (e) => {
+        const fieldName = e.target.name;
+        const fieldValue = e.target.value;
+
+        setFormData((prevState) => ({
+            ...prevState,
+            [fieldName]: fieldValue
+        }));
+    }
+
     // TODO: add an alert when a request is approved
     async function addApplication(appStatus) {
         var addRecordSuccessValue = false;
@@ -263,7 +273,7 @@ export default function ConfirmationPage({ params }) {
                 + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
                 + `&monthlyWater=${data.monthlyWater}`
                 + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
-                + `&status=Pending`
+                + `&status=Pending - Agent Action`
                 + `&requestorEmail=${session.user.email}`
                 + `&statusComments=${formData.statusComments}`
                 ,

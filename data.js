@@ -48,6 +48,8 @@ const statusColorMap = {
     Approved: "success",
     Pending: "warning",
     Rejected: "danger",
+    'Pending - Admin Action': "warning",
+    'Pending - Agent Action': "warning"
 };
 
 const dateOptions = {
