@@ -53,7 +53,7 @@ export default function AboutPage() {
 
         <br></br>
         <h2>
-          Spring 2023
+          Iteration I
         </h2>
         <table className={styles.table}>
           <thead>
@@ -102,7 +102,7 @@ export default function AboutPage() {
 
 		<br></br>
         <h2>
-          Fall 2023
+          Iteration II
         </h2>
         <table className={styles.table}>
           <thead>
@@ -119,15 +119,15 @@ export default function AboutPage() {
               <td>{'Team Lead and Full Stack Engineer'}</td>
               <td>{"Develop a working and easy to use MVP for client to be able to use. I would like the client to be able to process a new request for shelter as soon as possible identifying the duplication rules and make a decision without much manual interaction. Additionally, the interface should be easy to use and training-free. My goal is to use my expertise and make that happen as a team!"}</td>
               <td>
-                Deliver presentations to stakeholder. Enhance approval and rejection flow. Add validation logic.
+                Stakeholder presentations and communication. Admin approval and rejection workflow enhancement. UI and UX uplift. Validation logic enhancement.
               </td>
             </tr>
             <tr>
               <td>{'Dexter Wah'}</td>
               <td>{'Full Stack Engineer'}</td>
-              <td>{"Develop a solution to solve our client's pressing problems using user-centered design methodology and software technology. I would also like to understand the local impact financing scene and contribute to the Metro Atlanta community. My goal is to deliver value through active collaboration and needfinding!"}</td>
+              <td>{"Develop effective solutions using user-centered design and software development methodology. Contribute to the social impact financing scene using cutting-edge software and innovation. Create value through active collaboration and needfinding."}</td>
               <td>
-                Setup e-mail alert for admin and agent. Add new page to track pending requests.
+                Agent request workflow enhancement. E-mail functionality for admin communication. Queue tracker to monitor pending requests. Database design and schema enhancement. Progress documentation and illustration.
               </td>
             </tr>
           </tbody>

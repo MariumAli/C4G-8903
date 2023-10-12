@@ -162,7 +162,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete }) {
                             </span>
                         </Tooltip>
 
-                        {record["Status"] == "Pending" ?
+                        {record["Status"] == "Pending" || record["Status"] == "Pending - Agent Action" || record["Status"] == "Pending - Admin Action" ?
                             (<Tooltip content="Approve Record">
                                 <Button className="text-lg text-default-400 cursor-pointer active:opacity-50" variant="outlined" onClick={() => onUpdate(record, "Approved")}>
                                     <EditIcon />

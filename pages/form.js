@@ -42,6 +42,8 @@ export default function Contact() {
     const [householdMembers, setHouseholdMembers] = useState([])
     const [userRole, setUserRole] = useState("invalid");
 
+    const [addRecordSuccess, setAddRecordSuccess] = useState(false);
+
     useEffect(
         () => {
             async function fetchUserRole() {
@@ -110,15 +112,64 @@ export default function Contact() {
             },
         );
 
-        // POST the data to the URL of the form
-        console.log('Sending form data: ', data);
-        console.log('with household members: ', householdMembers);
-        router.push(
-            {
-                pathname: "/confirmation",
-                query: data
-            }
-        );
+        var addRecordSuccessValue = false;
+        if (router.isReady) {
+            let add_res = await fetch(
+                `/api/addApplication?applicantDOB=${formData.applicantDOB}`
+                + `&applicantFirstName=${formData.applicantFirstName}`
+                + `&applicantLastName=${formData.applicantLastName}`
+                + `&applicantMiddleName=${formData.applicantMiddleName}`
+                + `&applicantStreetAddress=${formData.applicantStreetAddress}`
+                + `&applicantCity=${formData.applicantCity}`
+                + `&applicantPostalCode=${formData.applicantPostalCode}`
+                + `&applicantCountry=${formData.applicantCountry}`
+                + `&lroNumber=${formData.lroNumber}`
+                + `&agencyName=${formData.agencyName}`
+                + `&lroEmail=${formData.lroEmail}`
+                + `&fundingPhase=${formData.fundingPhase}`
+                + `&jurisdiction=${formData.jurisdiction}`
+                + `&paymentVendor=${formData.paymentVendor}`
+                + `&monthlyRent=${formData.monthlyRent}`
+                + `&monthlyRentLRO=${formData.monthlyRentLRO}`
+                + `&monthlyMortgage=${formData.monthlyMortgage}`
+                + `&monthlyMortgageLRO=${formData.monthlyMortgageLRO}`
+                + `&lodgingNightCost=${formData.lodgingNightCost}`
+                + `&lodgingNightCount=${formData.lodgingNightCount}`
+                + `&lodgingNightCostLRO=${formData.lodgingNightCostLRO}`
+                + `&monthlyGas=${formData.monthlyGas}`
+                + `&monthlyGasLRO=${formData.monthlyGasLRO}`
+                + `&monthlyElectric=${formData.monthlyElectric}`
+                + `&monthlyElectricLRO=${formData.monthlyElectricLRO}`
+                + `&monthlyWater=${formData.monthlyWater}`
+                + `&monthlyWaterLRO=${formData.monthlyWaterLRO}`
+                + `&RequestorEmail=${session.user.email}`
+                + `&Status=Pending - Admin Action`
+                ,
+                {
+                    method: "POST",
+                    headers: {
+                        "accept": "application/json",
+                    },
+                },
+            );
+            let records = await add_res.json();
+            addRecordSuccessValue = records.result[0].success;
+        }
+        setAddRecordSuccess(addRecordSuccessValue);
+        console.log(`Submitted, Success: ${addRecordSuccessValue}`);
+
+        window.alert("Form has been submitted, returning to home.");
+        router.push('/');
+
+        // go to confirmation page
+        // console.log('Sending form data: ', data);
+        // console.log('with household members: ', householdMembers);
+        // router.push(
+        //     {
+        //         pathname: "/confirmation",
+        //         query: data
+        //     }
+        // );
     }
 
     if (status != "authenticated") {
@@ -411,7 +462,7 @@ export default function Contact() {
                                 <button className={styles.button} style={{marginLeft: 'auto', marginRight: 'auto', marginTop: "5px", marginBottom: "5px"}} onClick={() => addMember()}>Add</button>
                             </div>
 
-                            <button className={styles.button} style={{ marginTop: '10px', marginBottom: "10px" }} type="submit" >Process Information</button>
+                            <button className={styles.button} style={{ marginTop: '10px', marginBottom: "10px" }} type="submit">Process Information</button>
                         </form>
                 }
             </div >

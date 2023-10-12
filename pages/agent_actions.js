@@ -1,17 +1,18 @@
-import styles from '@/styles/Home.module.css';
 import React, { useEffect, useState } from "react";
+import { CSVLink } from "react-csv";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import ResponsiveRecordsTable from '@/components/ResponsiveRecordsTable';
+import styles from '@/styles/Home.module.css'
+import styled from 'styled-components';
 import { columns, initialVisibleColumns } from "@/data";
 
 
-export default function Audit({ params }) {
+export default function AdminActions({ params }) {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [allRecords, setAllRecords] = useState([]);
     const [userRole, setUserRole] = useState("invalid");
-
 
     useEffect(
         () => {
@@ -43,11 +44,21 @@ export default function Audit({ params }) {
 
     useEffect(
         () => {
+            async function onStatusChange() {
+                console.log(`status is: ${status}`);
+            }
+            onStatusChange();
+        },
+        [status]
+    )
+
+    useEffect(
+        () => {
             async function getAllRecords() {
-                if (router.isReady && session && session.user) {
+                if (router.isReady) {
 
                     let records_res = await fetch(
-                        `/api/gatherAllRecordsForEmail?requestorEmail=${session.user.email}`,
+                        `/api/gatherAllRecords`,
                         {
                             method: "GET",
                             headers: {
@@ -57,18 +68,38 @@ export default function Audit({ params }) {
                     );
                     let records = await records_res.json();
 
-                    console.log("Setting All Applicant Records for email");
+                    console.log("Setting All Applicant Records");
+                    console.log(records);
                     setAllRecords(records.result);
                 } else {
                     setAllRecords([]);
                 }
             }
-
             getAllRecords();
         },
-        [router.isReady, status, session]
+        [router.isReady]
     );
 
+    const submitDeleteAllRecords = async (e) => {
+        // We don't want the page to refresh
+        e.preventDefault();
+
+        let res = await fetch(
+            `/api/removeAllRecords`,
+            {
+                method: "DELETE",
+                headers: {
+                    "accept": "application/json",
+                },
+                body: { id: '*' }
+            },
+        );
+        let res_json = await res.json();
+        console.log(`Remove all record call response status: ${res.status}`);
+        alert(res_json.result);
+
+        window.location.reload();
+    }
 
     async function updateApplication(record, status) {
         if (record) {
@@ -124,13 +155,13 @@ export default function Audit({ params }) {
             </main>
         )
     } else {
-        if (userRole != "admin") {
+        if (!["agent", "admin-agent", "admin"].includes(userRole)) {
             return (
                 <main className={styles.main}>
-                    <h1>Insufficient Privileges {`(${userRole})`}</h1>
+                    <h1>Insufficient Privileges</h1>
                     <br></br>
                     <div className={styles.card}>
-                        <p>This page requires admin-level privileges to access, sign in with a different account with these privileges to use this page.</p>
+                        <p>This page requires agent-level privileges to access, sign in with a different account with these privileges to use this page.</p>
                         <br></br>
                         <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
                             Return Home
@@ -141,13 +172,12 @@ export default function Audit({ params }) {
         } else {
             return (
                 <main className={styles.auditmain}>
-                    <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Historical Requests</h2>
-                    <ResponsiveRecordsTable allRecords={allRecords} 
-                    onUpdate={updateApplication} 
-                    onDelete={deleteApplication} 
+                    <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Pending Requests in Agent Queue</h2>
+
+                    <ResponsiveRecordsTable allRecords={allRecords} onUpdate={updateApplication} onDelete={deleteApplication} 
                     columns={columns}
-                    initialVisibleColumns={initialVisibleColumns}
-                    />
+                    initialVisibleColumns={initialVisibleColumns}/>
+
                 </main>
             );
         }

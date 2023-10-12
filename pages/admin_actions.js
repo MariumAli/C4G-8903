@@ -172,7 +172,7 @@ export default function AdminActions({ params }) {
         } else {
             return (
                 <main className={styles.auditmain}>
-                    <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Explore Records</h2>
+                    <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Pending Requests in Admin Queue</h2>
 
                     <ResponsiveRecordsTable allRecords={allRecords} onUpdate={updateApplication} onDelete={deleteApplication} 
                     columns={columns}
