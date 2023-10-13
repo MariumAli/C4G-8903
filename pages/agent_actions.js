@@ -155,6 +155,29 @@ export default function AdminActions({ params }) {
         window.location.reload();
     }
 
+    async function editApplication(record) {
+
+        let res = await fetch(
+            `/api/getRecord?identity=${record.ApplicationId}`,
+            {
+                method: "GET",
+                headers: {
+                    "accept": "application/json",
+                },
+            },
+        );
+        let res_json = await res.json();
+        console.log(`edit record call response status: ${res.status}`);
+
+        router.push(
+            {
+                pathname: "/formEdit",
+                query: res_json.result[0]
+            }
+        );
+
+    }
+
     if (status != "authenticated") {
         return (
             <main className={styles.main}>
@@ -191,6 +214,7 @@ export default function AdminActions({ params }) {
                     <ResponsiveRecordsTable allRecords={allRecords} 
                     onUpdate={updateApplication} 
                     onDelete={deleteApplication} 
+                    onEdit={editApplication} 
                     columns={columns}
                     initialVisibleColumns={initialVisibleColumns}
                     />

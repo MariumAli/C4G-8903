@@ -140,6 +140,29 @@ export default function AdminActions({ params }) {
         window.location.reload();
     }
 
+    async function editApplication(record) {
+
+        let res = await fetch(
+            `/api/getRecord?identity=${record.ApplicationId}`,
+            {
+                method: "GET",
+                headers: {
+                    "accept": "application/json",
+                },
+            },
+        );
+        let res_json = await res.json();
+        console.log(`edit record call response status: ${res.status}`);
+
+        router.push(
+            {
+                pathname: "/formEdit",
+                query: res_json.result[0]
+            }
+        );
+
+    }
+
     if (status != "authenticated") {
         return (
             <main className={styles.main}>
@@ -174,7 +197,10 @@ export default function AdminActions({ params }) {
                 <main className={styles.auditmain}>
                     <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Pending Requests in Admin Queue</h2>
 
-                    <ResponsiveRecordsTable allRecords={allRecords} onUpdate={updateApplication} onDelete={deleteApplication} 
+                    <ResponsiveRecordsTable allRecords={allRecords} 
+                    onUpdate={updateApplication} 
+                    onDelete={deleteApplication} 
+                    onEdit={editApplication} 
                     columns={columns}
                     initialVisibleColumns={initialVisibleColumns}/>
 
