@@ -58,7 +58,7 @@ export default function AdminActions({ params }) {
                 if (router.isReady) {
 
                     let records_res = await fetch(
-                        `/api/gatherAllRecords`,
+                        `/api/gatherPendingRecordsForAdmin`,
                         {
                             method: "GET",
                             headers: {
@@ -68,7 +68,7 @@ export default function AdminActions({ params }) {
                     );
                     let records = await records_res.json();
 
-                    console.log("Setting All Applicant Records");
+                    console.log("Setting Pending Applicant Records for Admin");
                     console.log(records);
                     setAllRecords(records.result);
                 } else {
