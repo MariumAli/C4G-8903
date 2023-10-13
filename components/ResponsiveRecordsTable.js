@@ -23,6 +23,7 @@ import { DeleteIcon } from "@/components/DeleteIcon";
 import { EyeIcon } from "@/components/EyeIcon";
 import { SearchIcon } from "@/components/SearchIcon";
 import { ChevronDownIcon } from "@/components/ChevronDownIcon";
+import { CheckIcon } from "@/components/CheckIcon";
 import { columns, statusOptions, initialVisibleColumns, statusColorMap, dateOptions } from "@/data";
 import { capitalize } from "@/utils";
 import { Card, CardBody, Divider } from "@nextui-org/react";
@@ -172,7 +173,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                         {record["Status"] == "Pending" || record["Status"] == "Pending - Agent Action" || record["Status"] == "Pending - Admin Action" ?
                             (<Tooltip content="Approve Record">
                                 <Button className="text-lg text-default-400 cursor-pointer active:opacity-50" variant="outlined" onClick={() => onUpdate(record, "Approved")}>
-                                    <EditIcon />
+                                    <CheckIcon />
                                 </Button>
                             </Tooltip>
                             ) : ""}

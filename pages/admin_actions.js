@@ -122,6 +122,29 @@ export default function AdminActions({ params }) {
 
     }
 
+    async function updateApplicationStatus(record) {
+
+        let res = await fetch(
+            `/api/getRecord?identity=${record.ApplicationId}`,
+            {
+                method: "GET",
+                headers: {
+                    "accept": "application/json",
+                },
+            },
+        );
+        let res_json = await res.json();
+        console.log(`update record call response status: ${res.status}`);
+
+        router.push(
+            {
+                pathname: "/confirmation",
+                query: res_json.result[0]
+            }
+        );
+
+    }    
+
     async function deleteApplication(record) {
 
         let res = await fetch(
@@ -198,7 +221,7 @@ export default function AdminActions({ params }) {
                     <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Pending Requests in Admin Queue</h2>
 
                     <ResponsiveRecordsTable allRecords={allRecords} 
-                    onUpdate={updateApplication} 
+                    onUpdate={updateApplicationStatus} 
                     onDelete={deleteApplication} 
                     onEdit={editApplication} 
                     columns={columns}

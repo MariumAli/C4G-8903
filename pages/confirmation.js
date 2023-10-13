@@ -53,7 +53,7 @@ export default function ConfirmationPage({ params }) {
             async function getSimilarRecords() {
                 if (router.isReady) {
                     let records_res = await fetch(
-                        `/api/gatherSimilarRecords?dob=${data.applicantDOB}&firstname=${data.applicantFirstName}&lastname=${data.applicantLastName}`,
+                        `/api/gatherSimilarRecords?dob=${data.DOB}&firstname=${data.FirstName}&lastname=${data.LastName}`,
                         {
                             method: "GET",
                             headers: {
@@ -119,7 +119,7 @@ export default function ConfirmationPage({ params }) {
 
     const processApprove = () => {
         setConfirmRejectPressed(true);
-         setApplicationStatus("Approved");
+        setApplicationStatus("Approved");
         addApplication("Approved");
     }
 
@@ -138,35 +138,10 @@ export default function ConfirmationPage({ params }) {
         var addRecordSuccessValue = false;
         if (router.isReady) {
             let add_res = await fetch(
-                `/api/addApplication?applicantDOB=${data.applicantDOB}`
-                + `&applicantFirstName=${data.applicantFirstName}`
-                + `&applicantLastName=${data.applicantLastName}`
-                + `&applicantMiddleName=${data.applicantMiddleName}`
-                + `&applicantStreetAddress=${data.applicantStreetAddress}`
-                + `&applicantCity=${data.applicantCity}`
-                + `&applicantPostalCode=${data.applicantPostalCode}`
-                + `&applicantCountry=${data.applicantCountry}`
-                + `&lroNumber=${data.lroNumber}`
-                + `&agencyName=${data.agencyName}`
-                + `&lroEmail=${data.lroEmail}`
-                + `&fundingPhase=${data.fundingPhase}`
-                + `&jurisdiction=${data.jurisdiction}`
-                + `&paymentVendor=${data.paymentVendor}`
-                + `&monthlyRent=${data.monthlyRent}`
-                + `&monthlyRentLRO=${data.monthlyRentLRO}`
-                + `&monthlyMortgage=${data.monthlyMortgage}`
-                + `&monthlyMortgageLRO=${data.monthlyMortgageLRO}`
-                + `&lodgingNightCost=${data.lodgingNightCost}`
-                + `&lodgingNightCount=${data.lodgingNightCount}`
-                + `&lodgingNightCostLRO=${data.lodgingNightCostLRO}`
-                + `&monthlyGas=${data.monthlyGas}`
-                + `&monthlyGasLRO=${data.monthlyGasLRO}`
-                + `&monthlyElectric=${data.monthlyElectric}`
-                + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
-                + `&monthlyWater=${data.monthlyWater}`
-                + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
-                + `&RequestorEmail=${session.user.email}`
-                + `&Status=${appStatus}`
+                `/api/updateApplicationStatus?`
+                + `status=Approved`
+                + `&statusComments=${formData.statusComments}`
+                + `&applicationId=${data.ApplicationId}`
                 ,
                 {
                     method: "POST",
@@ -179,7 +154,6 @@ export default function ConfirmationPage({ params }) {
             addRecordSuccessValue = records.result[0].success;
         }
         setAddRecordSuccess(addRecordSuccessValue);
-
         console.log(`Submitted, Success: ${addRecordSuccessValue}`);
 
         // trigger email notification
@@ -187,44 +161,22 @@ export default function ConfirmationPage({ params }) {
             `/api/mailAgent`,
             {
                 method: "POST",
+                query: data
             },
         );
+
+        window.alert("Request has been processed, returning to home.");
+        router.push('/');
     }
 
     async function processReject() {
         var addRecordSuccessValue = false;
         if (router.isReady) {
             let add_res = await fetch(
-                `/api/addApplication?applicantDOB=${data.applicantDOB}`
-                + `&applicantFirstName=${data.applicantFirstName}`
-                + `&applicantLastName=${data.applicantLastName}`
-                + `&applicantMiddleName=${data.applicantMiddleName}`
-                + `&applicantStreetAddress=${data.applicantStreetAddress}`
-                + `&applicantCity=${data.applicantCity}`
-                + `&applicantPostalCode=${data.applicantPostalCode}`
-                + `&applicantCountry=${data.applicantCountry}`
-                + `&lroNumber=${data.lroNumber}`
-                + `&agencyName=${data.agencyName}`
-                + `&lroEmail=${data.lroEmail}`
-                + `&fundingPhase=${data.fundingPhase}`
-                + `&jurisdiction=${data.jurisdiction}`
-                + `&paymentVendor=${data.paymentVendor}`
-                + `&monthlyRent=${data.monthlyRent}`
-                + `&monthlyRentLRO=${data.monthlyRentLRO}`
-                + `&monthlyMortgage=${data.monthlyMortgage}`
-                + `&monthlyMortgageLRO=${data.monthlyMortgageLRO}`
-                + `&lodgingNightCost=${data.lodgingNightCost}`
-                + `&lodgingNightCount=${data.lodgingNightCount}`
-                + `&lodgingNightCostLRO=${data.lodgingNightCostLRO}`
-                + `&monthlyGas=${data.monthlyGas}`
-                + `&monthlyGasLRO=${data.monthlyGasLRO}`
-                + `&monthlyElectric=${data.monthlyElectric}`
-                + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
-                + `&monthlyWater=${data.monthlyWater}`
-                + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
-                + `&status=Rejected`
-                + `&requestorEmail=${session.user.email}`
+                `/api/updateApplicationStatus?`
+                + `status=Rejected`
                 + `&statusComments=${formData.statusComments}`
+                + `&applicationId=${data.ApplicationId}`
                 ,
                 {
                     method: "POST",
@@ -238,44 +190,30 @@ export default function ConfirmationPage({ params }) {
         }
 
         setConfirmRejectPressed(true);
-         setApplicationStatus("Rejected");
+        setApplicationStatus("Rejected");
         addApplication("Rejected");
+
+        // trigger email notification
+        let res = await fetch(
+            `/api/mailAgent`,
+            {
+                method: "POST",
+                query: data
+            },
+        );
+
+        window.alert("Request has been processed, returning to home.");
+        router.push('/');
     }
 
     async function processFurtherInfo() {
         var addRecordSuccessValue = false;
         if (router.isReady) {
             let add_res = await fetch(
-                `/api/addApplication?applicantDOB=${data.applicantDOB}`
-                + `&applicantFirstName=${data.applicantFirstName}`
-                + `&applicantLastName=${data.applicantLastName}`
-                + `&applicantMiddleName=${data.applicantMiddleName}`
-                + `&applicantStreetAddress=${data.applicantStreetAddress}`
-                + `&applicantCity=${data.applicantCity}`
-                + `&applicantPostalCode=${data.applicantPostalCode}`
-                + `&applicantCountry=${data.applicantCountry}`
-                + `&lroNumber=${data.lroNumber}`
-                + `&agencyName=${data.agencyName}`
-                + `&lroEmail=${data.lroEmail}`
-                + `&fundingPhase=${data.fundingPhase}`
-                + `&jurisdiction=${data.jurisdiction}`
-                + `&paymentVendor=${data.paymentVendor}`
-                + `&monthlyRent=${data.monthlyRent}`
-                + `&monthlyRentLRO=${data.monthlyRentLRO}`
-                + `&monthlyMortgage=${data.monthlyMortgage}`
-                + `&monthlyMortgageLRO=${data.monthlyMortgageLRO}`
-                + `&lodgingNightCost=${data.lodgingNightCost}`
-                + `&lodgingNightCount=${data.lodgingNightCount}`
-                + `&lodgingNightCostLRO=${data.lodgingNightCostLRO}`
-                + `&monthlyGas=${data.monthlyGas}`
-                + `&monthlyGasLRO=${data.monthlyGasLRO}`
-                + `&monthlyElectric=${data.monthlyElectric}`
-                + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
-                + `&monthlyWater=${data.monthlyWater}`
-                + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
-                + `&status='Pending - Agent Action'`
-                + `&requestorEmail=${session.user.email}`
+                `/api/updateApplicationStatus?`
+                + `status=Pending - Agent Action`
                 + `&statusComments=${formData.statusComments}`
+                + `&applicationId=${data.ApplicationId}`
                 ,
                 {
                     method: "POST",
@@ -290,8 +228,19 @@ export default function ConfirmationPage({ params }) {
 
         setConfirmRejectPressed(true);
         setApplicationStatus("Pending");
-        // TODO: Send Email
         addApplication("Pending - Agent Action");
+
+        // trigger email notification
+        let res = await fetch(
+            `/api/mailAgent`,
+            {
+                method: "POST",
+                query: data
+            },
+        );
+
+        window.alert("Request has been processed, returning to home.");
+        router.push('/');
     }
 
     if (status != "authenticated") {
@@ -346,28 +295,28 @@ export default function ConfirmationPage({ params }) {
 
                 <div className={styles.card}>
                     <h2>
-                        {`Pending Request for "${data.applicantFirstName} ${data.applicantMiddleName} ${data.applicantLastName}" (${data.directIndirect})`}
+                        {`Pending Request for "${data.FirstName} ${data.MiddleName} ${data.LastName}"`}
                     </h2>
                     <br></br>
-                    <p>{`DOB: ${data.applicantDOB}`}</p>
-                    <p>{`Address: ${data.applicantStreetAddress}, ${data.applicantCity} (${data.applicantPostalCode})`}</p>
-                    <p>{`Agency: ${data.agencyName} (LRO #${data.lroNumber})`}</p>
-                    <p>{`Jurisdiction: ${data.jurisdiction}`}</p>
-                    <p>{`Funding Phase: ${data.fundingPhase}`}</p>
-                    <p>{`Payment Vendor: ${data.paymentVendor}`}</p>
-                    <p>{`Monthly Rent: $${data.monthlyRent}`}</p>
-                    <p>{`Monthly Rent LRO: $${data.monthlyRentLRO}`}</p>
-                    <p>{`Monthly Mortgage: $${data.monthlyMortgage}`}</p>
-                    <p>{`Monthly Mortgage LRO: $${data.monthlyMortgageLRO}`}</p>
-                    <p>{`Lodging Night Count: $${data.lodgingNightCount}`}</p>
-                    <p>{`Lodging Night Cost: $${data.lodgingNightCost}`}</p>
-                    <p>{`Lodging Night Cost LRO: $${data.lodgingNightCostLRO}`}</p>
-                    <p>{`Monthly Gas: $${data.monthlyGas}`}</p>
-                    <p>{`Monthly Gas LRO: $${data.monthlyGasLRO}`}</p>
-                    <p>{`Monthly Electric: $${data.monthlyElectric}`}</p>
-                    <p>{`Monthly Electric LRO: $${data.monthlyElectricLRO}`}</p>
-                    <p>{`Monthly Water: $${data.monthlyWater}`}</p>
-                    <p>{`Monthly Water LRO: $${data.monthlyWaterLRO}`}</p>
+                    <p>{`DOB: ${data.DOB}`}</p>
+                    <p>{`Address: ${data.StreetAddress}, ${data.City} (${data.PostalCode})`}</p>
+                    <p>{`Agency: ${data.LROAgencyName} (LRO #${data.LRONumber})`}</p>
+                    <p>{`Jurisdiction: ${data.Jurisdiction}`}</p>
+                    <p>{`Funding Phase: ${data.FundingPhase}`}</p>
+                    <p>{`Payment Vendor: ${data.PaymentVendor}`}</p>
+                    <p>{`Monthly Rent: $${data.MonthlyRentAmt}`}</p>
+                    <p>{`Monthly Rent LRO: $${data.MonthyRentAmt_LRO}`}</p>
+                    <p>{`Monthly Mortgage: $${data.MonthlyMortgageAmt}`}</p>
+                    <p>{`Monthly Mortgage LRO: $${data.MonthlyMortgageAmt_LRO}`}</p>
+                    <p>{`Lodging Night Count: $${data.LodgingNightCount}`}</p>
+                    <p>{`Lodging Night Cost: $${data.LodgingCostPerNight}`}</p>
+                    <p>{`Lodging Night Cost LRO: $${data.LodgingCostPerNight_LRO}`}</p>
+                    <p>{`Monthly Gas: $${data.MonthlyGasAmt}`}</p>
+                    <p>{`Monthly Gas LRO: $${data.MonthlyGasAmt_LRO}`}</p>
+                    <p>{`Monthly Electric: $${data.MonthlyElectricityAmt}`}</p>
+                    <p>{`Monthly Electric LRO: $${data.MonthlyElectricityAmt_LRO}`}</p>
+                    <p>{`Monthly Water: $${data.MonthlyWaterAmt}`}</p>
+                    <p>{`Monthly Water LRO: $${data.MonthlyWaterAmt_LRO}`}</p>
                 </div>
 
                 <div className={styles.card}>
