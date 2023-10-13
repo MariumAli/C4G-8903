@@ -119,7 +119,7 @@ export default function AboutPage() {
               <td>{'Team Lead and Full Stack Engineer'}</td>
               <td>{"Develop a working and easy to use MVP for client to be able to use. I would like the client to be able to process a new request for shelter as soon as possible identifying the duplication rules and make a decision without much manual interaction. Additionally, the interface should be easy to use and training-free. My goal is to use my expertise and make that happen as a team!"}</td>
               <td>
-                Stakeholder presentations and communication. Admin approval and rejection workflow enhancement. UI and UX uplift. Validation logic enhancement.
+                Stakeholder presentations and communication. User Interface and User Experience uplift. User authentication enhancement. Validation logic enhancement. Admin workflow enhancement. Software testing and validation. 
               </td>
             </tr>
             <tr>
@@ -127,7 +127,7 @@ export default function AboutPage() {
               <td>{'Full Stack Engineer'}</td>
               <td>{"Develop effective solutions using user-centered design and software development methodology. Contribute to the social impact financing scene using cutting-edge software and innovation. Create value through active collaboration and needfinding."}</td>
               <td>
-                Agent request workflow enhancement. E-mail functionality for admin communication. Queue tracker to monitor pending requests. Database design and schema enhancement. Progress documentation and illustration.
+                Agent request workflow enhancement. Admin approval and rejection workflow enhancement. E-mail functionality for admin communication. Queue tracker to monitor pending requests. Database design and schema enhancement. Progress documentation and illustration.
               </td>
             </tr>
           </tbody>

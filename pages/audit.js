@@ -86,24 +86,26 @@ export default function Audit({ params }) {
     );
 
 
-    async function updateApplication(record, status) {
-        if (record) {
-            let res = await fetch(
-                `/api/updateApplication?identity=${record.ApplicationId}&status=${status}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "accept": "application/json",
-                    },
+    async function updateApplicationStatus(record) {
+
+        let res = await fetch(
+            `/api/getRecord?identity=${record.ApplicationId}`,
+            {
+                method: "GET",
+                headers: {
+                    "accept": "application/json",
                 },
-            );
-            let res_json = await res.json();
-            console.log(`update record call response status: ${res.status}`);
-            alert(res_json.result);
-        } else {
-            alert("An error has occurred in parsing this form, please refresh the page.");
-        }
-        window.location.reload();
+            },
+        );
+        let res_json = await res.json();
+        console.log(`update record call response status: ${res.status}`);
+
+        router.push(
+            {
+                pathname: "/confirmation",
+                query: res_json.result[0]
+            }
+        );
 
     }
 
@@ -182,7 +184,7 @@ export default function Audit({ params }) {
                 <main className={styles.auditmain}>
                     <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Historical Requests</h2>
                     <ResponsiveRecordsTable allRecords={allRecords} 
-                    onUpdate={updateApplication} 
+                    onUpdate={updateApplicationStatus} 
                     onDelete={deleteApplication}
                     onEdit={editApplication} 
                     columns={columns}

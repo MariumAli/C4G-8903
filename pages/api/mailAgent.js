@@ -30,7 +30,7 @@ export default handler = async (req, res) => {
                 name: "EFSP Admin",
                 address: process.env.NODEMAILER_EMAIL,
             },
-            to: "c4g.efsp.agent@gmail.com",
+            to: req.query.recipient,
             subject: "EFSP Portal - A request is updated",
             text: "Visit https://c4g-efsp.vercel.app/ to view the request.",
         };
