@@ -38,7 +38,8 @@ const detailsColumns = [
 
 const statusOptions = [
   {name: "Approved", uid: "approved"},
-  {name: "Pending", uid: "pending"},
+  {name: "Pending - Admin Action", uid: "pending - admin action"},
+  {name: "Pending - Agent Action", uid: "pending - agent action"},
   {name: "Rejected", uid: "rejected"},
 ];
 
