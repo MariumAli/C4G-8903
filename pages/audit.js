@@ -46,19 +46,36 @@ export default function Audit({ params }) {
             async function getAllRecords() {
                 if (router.isReady && session && session.user) {
 
-                    let records_res = await fetch(
-                        `/api/gatherAllRecordsForEmail?requestorEmail=${session.user.email}`,
-                        {
-                            method: "GET",
-                            headers: {
-                                "accept": "application/json",
-                            },
-                        },
-                    );
-                    let records = await records_res.json();
+                    if (userRole != "admin"){
 
-                    console.log("Setting All Applicant Records for email");
-                    setAllRecords(records.result);
+                        let records_res = await fetch(
+                            `/api/gatherAllRecordsForEmail?requestorEmail=${session.user.email}`,
+                            {
+                                method: "GET",
+                                headers: {
+                                    "accept": "application/json",
+                                },
+                            },
+                        );
+                        let records = await records_res.json();
+
+                        console.log("Setting All Applicant Records for email");
+                        setAllRecords(records.result);
+                    } else {
+                        let records_res = await fetch(
+                            `/api/gatherAllRecords`,
+                            {
+                                method: "GET",
+                                headers: {
+                                    "accept": "application/json",
+                                },
+                            },
+                        );
+                        let records = await records_res.json();
+
+                        console.log("Setting All Applicant Records for admin");
+                        setAllRecords(records.result);
+                    }
                 } else {
                     setAllRecords([]);
                 }

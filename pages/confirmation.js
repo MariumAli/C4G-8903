@@ -273,7 +273,7 @@ export default function ConfirmationPage({ params }) {
                 + `&monthlyElectricLRO=${data.monthlyElectricLRO}`
                 + `&monthlyWater=${data.monthlyWater}`
                 + `&monthlyWaterLRO=${data.monthlyWaterLRO}`
-                + `&status=Pending - Agent Action`
+                + `&status='Pending - Agent Action'`
                 + `&requestorEmail=${session.user.email}`
                 + `&statusComments=${formData.statusComments}`
                 ,
@@ -289,9 +289,9 @@ export default function ConfirmationPage({ params }) {
         }
 
         setConfirmRejectPressed(true);
-         setApplicationStatus("Pending");
+        setApplicationStatus("Pending");
         // TODO: Send Email
-        addApplication("Pending");
+        addApplication("Pending - Agent Action");
     }
 
     if (status != "authenticated") {

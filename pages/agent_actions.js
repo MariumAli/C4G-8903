@@ -55,22 +55,37 @@ export default function AdminActions({ params }) {
     useEffect(
         () => {
             async function getAllRecords() {
-                if (router.isReady) {
+                if (router.isReady && session && session.user) {
 
-                    let records_res = await fetch(
-                        `/api/gatherAllRecords`,
-                        {
-                            method: "GET",
-                            headers: {
-                                "accept": "application/json",
-                            },
-                        },
-                    );
-                    let records = await records_res.json();
+                	if (userRole !="admin"){
+	                    let records_res = await fetch(
+	                        `/api/gatherPendingRecordsForAgent?requestorEmail=${session.user.email}`,
+	                        {
+	                            method: "GET",
+	                            headers: {
+	                                "accept": "application/json",
+	                            },
+	                        },
+	                    );
+	                    let records = await records_res.json();
 
-                    console.log("Setting All Applicant Records");
-                    console.log(records);
-                    setAllRecords(records.result);
+	                    console.log("Setting Pending Applicant Records for Agent");
+	                    setAllRecords(records.result);
+	                } else {
+	                    let records_res = await fetch(
+	                        `/api/gatherPendingRecordsForAdmin`,
+	                        {
+	                            method: "GET",
+	                            headers: {
+	                                "accept": "application/json",
+	                            },
+	                        },
+	                    );
+	                    let records = await records_res.json();
+
+	                    console.log("Setting Pending Applicant Records for Admin");
+	                    setAllRecords(records.result);	                	
+	                }
                 } else {
                     setAllRecords([]);
                 }
@@ -158,7 +173,7 @@ export default function AdminActions({ params }) {
         if (!["agent", "admin-agent", "admin"].includes(userRole)) {
             return (
                 <main className={styles.main}>
-                    <h1>Insufficient Privileges</h1>
+                    <h1>Insufficient Privileges {`(${userRole})`}</h1>
                     <br></br>
                     <div className={styles.card}>
                         <p>This page requires agent-level privileges to access, sign in with a different account with these privileges to use this page.</p>
@@ -173,11 +188,12 @@ export default function AdminActions({ params }) {
             return (
                 <main className={styles.auditmain}>
                     <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Pending Requests in Agent Queue</h2>
-
-                    <ResponsiveRecordsTable allRecords={allRecords} onUpdate={updateApplication} onDelete={deleteApplication} 
+                    <ResponsiveRecordsTable allRecords={allRecords} 
+                    onUpdate={updateApplication} 
+                    onDelete={deleteApplication} 
                     columns={columns}
-                    initialVisibleColumns={initialVisibleColumns}/>
-
+                    initialVisibleColumns={initialVisibleColumns}
+                    />
                 </main>
             );
         }
