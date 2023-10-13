@@ -31,7 +31,7 @@ export default handler = async (req, res) => {
                 address: process.env.NODEMAILER_EMAIL,
             },
             to: "c4g.efsp.main@gmail.com",
-            subject: "EFSP Portal - A request is created",
+            subject: "EFSP Portal - A request is created or updated",
             text: "Visit https://c4g-efsp.vercel.app/ to view the request.",
         };
         await new Promise((resolve, reject) => {
