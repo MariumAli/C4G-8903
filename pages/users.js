@@ -3,7 +3,13 @@ import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from 'next/router';
 import SimpleResponsiveTable from '@/components/SimpleResponsiveTable';
-import { userColumns } from "@/data";
+import {
+    Input,
+    Button,
+    CircularProgress,
+} from "@nextui-org/react";
+import { MailIcon } from "components/MailIcon";
+import { Select, SelectItem } from "@nextui-org/react";
 
 
 export default function Users({ params }) {
@@ -12,6 +18,7 @@ export default function Users({ params }) {
     const [allUsers, setAllUsers] = useState([]);
     const [addUserFormData, setAddUserFormData] = useState([]);
     const [userRole, setUserRole] = useState("invalid");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(
         () => {
@@ -33,6 +40,7 @@ export default function Users({ params }) {
                     if (res_json.hasOwnProperty('result') && res_json["result"] != "invalid") {
                         setUserRole(res_json["result"]);
                     }
+                    setIsLoading(false);
                 }
             }
             fetchUserRole();
@@ -111,8 +119,6 @@ export default function Users({ params }) {
     }
 
     const submitAddUserForm = async (e) => {
-        // We don't want the page to refresh
-        e.preventDefault();
 
         if ((addUserFormData.hasOwnProperty("email")) && (addUserFormData.hasOwnProperty("role"))) {
             let res = await fetch(
@@ -134,8 +140,6 @@ export default function Users({ params }) {
 
         window.location.reload();
     }
-
-
     if (status != "authenticated") {
         return (
             <main className={styles.main}>
@@ -150,59 +154,107 @@ export default function Users({ params }) {
                 </div>
             </main>
         )
-    } else {
-        if (userRole != "admin") {
-            return (
-                <main className={styles.main}>
-                    <h1>Insufficient Privileges {`(${userRole})`}</h1>
-                    <br></br>
-                    <div className={styles.card}>
-                        <p>This page requires admin-level privileges to access, sign in with a different account with these privileges to use this page.</p>
-                        <br></br>
-                        <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
-                            Return Home
-                        </button>
-                    </div>
-                </main>
-            )
-        } else {
-            return (
-                <main className={styles.auditmain}>
-                    <h1>Users</h1>
-                    <div style={{display: "flex"}}>
-                        <div className={styles.container} style={{ width: '30%', minWidth: "250px" }}>
-                            <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Add User</h2>
-                            <p style={{ marginTop: '10px', marginBottom: "10px" }}>
-                                {"Add a user via the email address and role."}
-                            </p>
-                            <form id="add-user-form" onSubmit={submitAddUserForm} style={{ overflow: 'hidden' }}>
-                                <div className={styles.container}>
-                                    <label className={styles.required}>User Email: </label>
-                                    <span style={{ display: "block", overflow: "hidden", marginTop: "5px" }}>
-                                        <input type="email" required={true} name="email" style={{ width: '100%' }} onChange={handleAddUserInput} value={addUserFormData.email}/>
-                                    </span>
-                                </div>
-                                <div className={styles.container}>
-                                    <label className={styles.required}>User Role: </label>
-                                    <span style={{ display: "block", overflow: "hidden", marginTop: "5px" }}>
-                                        <select type="text" name="role" style={{ width: '100%' }} onChange={handleAddUserInput} value={addUserFormData.role} >
-                                            <option value=""></option>
-                                            <option value="agent">agent</option>
-                                            <option value="admin-agent">admin-agent</option>
-                                            <option value="admin">admin</option>
-                                        </select>
-                                    </span>
-                                </div>
-                                <button className={styles.button} style={{ marginTop: '10px', marginBottom: "10px" }} type="submit">Submit</button>
-                            </form>
-                        </div>
-                    </div>
-                    <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Explore Users</h2>
+    } else if (isLoading) {
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                }}
+            >
+                <CircularProgress
+                    classNames={{
+                        svg: "w-36 h-36 drop-shadow-md",
+                        positions: "center"
+                    }}
+                    strokeWidth={4}
+                    label={'Loading ...'}
+                    size="lg"
+                    color="warning"
 
-                    <SimpleResponsiveTable allRecords={allUsers} 
-                    onDelete={submitRemoveUserForm}/>
-                </main>
-            );
-        }
+                />
+            </div>
+        );
+    } else if (userRole != "admin") {
+        return (
+            <main className={styles.main}>
+                <h1>Insufficient Privileges {`(${userRole})`}</h1>
+                <br></br>
+                <div className={styles.card}>
+                    <p>This page requires admin-level privileges to access, sign in with a different account with these privileges to use this page.</p>
+                    <br></br>
+                    <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
+                        Return Home
+                    </button>
+                </div>
+            </main>
+        )
+    } else {
+        return (
+
+            <div className="flex flex-col w-full space-y-4 flex-nowrap items-center mt-15 px-20">
+                <div className="flex text-base w-full space-y-9 flex-wrap flex-col items-center mt-10 px-10">
+                    <p className="flex font-mono font-large text-base">Add User</p>
+                </div>
+                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+
+                    <Input
+                        type="email"
+                        label="User Email:"
+                        placeholder="you@example.com"
+                        labelPlacement="outside"
+                        isClearable
+                        isRequired
+                        value={addUserFormData.email}
+                        name="email"
+                        onClear={() => setAddUserFormData((prevState) => ({
+                            ...prevState,
+                            ['email']: ''
+                        }))}
+                        startContent={
+                            <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                        }
+                        onChange={handleAddUserInput}
+                    />
+
+                    <Select
+                        type="text"
+                        label="User Role:"
+                        placeholder="User Role"
+                        labelPlacement="outside"
+                        isClearable
+                        isRequired
+                        value={addUserFormData.role}
+                        name="role"
+                        onClear={() => setAddUserFormData((prevState) => ({
+                            ...prevState,
+                            ['role']: ''
+                        }))}
+                        onChange={handleAddUserInput}
+                    >
+                        <SelectItem key="agent">agent</SelectItem>
+                        <SelectItem key="admin">admin</SelectItem>
+                        <SelectItem key="admin-agent">admin-agent</SelectItem>
+                    </Select>
+                </div>
+
+                <div className="flex text-base w-full space-y-4 flex-wrap flex-col items-center mt-15 pb-10">
+                    <Button color="primary" onClick={() => submitAddUserForm()}>
+                        Add User
+                    </Button>
+
+                </div>
+
+                <SimpleResponsiveTable allRecords={allUsers}
+                    onDelete={submitRemoveUserForm}
+                    userRole={userRole} />
+
+            </div>
+        );
     }
 }

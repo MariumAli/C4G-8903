@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { CSVLink } from "react-csv";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import ResponsiveRecordsTable from '@/components/ResponsiveRecordsTable';
 import styles from '@/styles/Home.module.css'
-import styled from 'styled-components';
+import { Button, CircularProgress } from "@nextui-org/react";
 import { columns, initialVisibleColumns } from "@/data";
 
 
@@ -13,6 +12,7 @@ export default function AdminActions({ params }) {
     const { data: session, status } = useSession();
     const [allRecords, setAllRecords] = useState([]);
     const [userRole, setUserRole] = useState("invalid");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(
         () => {
@@ -34,6 +34,7 @@ export default function AdminActions({ params }) {
                     if (res_json.hasOwnProperty('result')) {
                         setUserRole(res_json["result"]);
                     }
+                    setIsLoading(false);
                 }
             }
             fetchUserRole();
@@ -57,35 +58,35 @@ export default function AdminActions({ params }) {
             async function getAllRecords() {
                 if (router.isReady && session && session.user) {
 
-                	if (userRole !="admin"){
-	                    let records_res = await fetch(
-	                        `/api/gatherPendingRecordsForAgent?requestorEmail=${session.user.email}`,
-	                        {
-	                            method: "GET",
-	                            headers: {
-	                                "accept": "application/json",
-	                            },
-	                        },
-	                    );
-	                    let records = await records_res.json();
+                    if (userRole != "admin") {
+                        let records_res = await fetch(
+                            `/api/gatherPendingRecordsForAgent?requestorEmail=${session.user.email}`,
+                            {
+                                method: "GET",
+                                headers: {
+                                    "accept": "application/json",
+                                },
+                            },
+                        );
+                        let records = await records_res.json();
 
-	                    console.log("Setting Pending Applicant Records for Agent");
-	                    setAllRecords(records.result);
-	                } else {
-	                    let records_res = await fetch(
-	                        `/api/gatherPendingRecordsForAdmin`,
-	                        {
-	                            method: "GET",
-	                            headers: {
-	                                "accept": "application/json",
-	                            },
-	                        },
-	                    );
-	                    let records = await records_res.json();
+                        console.log("Setting Pending Applicant Records for Agent");
+                        setAllRecords(records.result);
+                    } else {
+                        let records_res = await fetch(
+                            `/api/gatherPendingRecordsForAdmin`,
+                            {
+                                method: "GET",
+                                headers: {
+                                    "accept": "application/json",
+                                },
+                            },
+                        );
+                        let records = await records_res.json();
 
-	                    console.log("Setting Pending Applicant Records for Admin");
-	                    setAllRecords(records.result);	                	
-	                }
+                        console.log("Setting Pending Applicant Records for Admin");
+                        setAllRecords(records.result);
+                    }
                 } else {
                     setAllRecords([]);
                 }
@@ -159,7 +160,7 @@ export default function AdminActions({ params }) {
         );
 
     }
-    
+
     async function deleteApplication(record) {
 
         let res = await fetch(
@@ -201,28 +202,41 @@ export default function AdminActions({ params }) {
 
     }
 
-    if (status != "authenticated") {
+    if (isLoading) {
         return (
-            <main className={styles.main}>
-                <h1>Page Requires Authentication</h1>
-                <br></br>
-                <div className={styles.card}>
-                    <p>Navigate to the home page and sign-in first.</p>
-                    <br></br>
-                    <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
-                        Return Home
-                    </button>
-                </div>
-            </main>
-        )
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                }}
+            >
+                <CircularProgress
+                    classNames={{
+                        svg: "w-36 h-36 drop-shadow-md",
+                        positions: "center"
+                    }}
+                    strokeWidth={4}
+                    label={'Loading ...'}
+                    size="lg"
+                    color="warning"
+
+                />
+            </div>
+        );
     } else {
-        if (!["agent", "admin-agent", "admin"].includes(userRole)) {
+
+        if (status != "authenticated") {
             return (
                 <main className={styles.main}>
-                    <h1>Insufficient Privileges {`(${userRole})`}</h1>
+                    <h1>Page Requires Authentication</h1>
                     <br></br>
                     <div className={styles.card}>
-                        <p>This page requires agent-level privileges to access, sign in with a different account with these privileges to use this page.</p>
+                        <p>Navigate to the home page and sign-in first.</p>
                         <br></br>
                         <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
                             Return Home
@@ -231,18 +245,34 @@ export default function AdminActions({ params }) {
                 </main>
             )
         } else {
-            return (
-                <main className={styles.auditmain}>
-                    <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Pending Requests in Agent Queue</h2>
-                    <ResponsiveRecordsTable allRecords={allRecords} 
-                    onUpdate={updateApplicationStatus} 
-                    onDelete={deleteApplication} 
-                    onEdit={editApplication} 
-                    columns={columns}
-                    initialVisibleColumns={initialVisibleColumns}
-                    />
-                </main>
-            );
+            if (!["agent", "admin-agent", "admin"].includes(userRole)) {
+                return (
+                    <main className={styles.main}>
+                        <h1>Insufficient Privileges {`(${userRole})`}</h1>
+                        <br></br>
+                        <div className={styles.card}>
+                            <p>This page requires agent-level privileges to access, sign in with a different account with these privileges to use this page.</p>
+                            <br></br>
+                            <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
+                                Return Home
+                            </button>
+                        </div>
+                    </main>
+                )
+            } else {
+                return (
+                    <main className={styles.auditmain}>
+                        <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Pending Requests in Agent Queue</h2>
+                        <ResponsiveRecordsTable allRecords={allRecords}
+                            onUpdate={updateApplicationStatus}
+                            onDelete={deleteApplication}
+                            onEdit={editApplication}
+                            columns={columns}
+                            initialVisibleColumns={initialVisibleColumns}
+                            userRole={userRole} />
+                    </main>
+                );
+            }
         }
     }
 }

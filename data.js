@@ -13,6 +13,7 @@ const columns = [
 const userColumns = [
   {name: "Email", uid: "email", sortable: true},
   {name: "Role", uid: "role", sortable: true},
+  {name: "Actions", uid: "actions"},
 ];
 
 const detailsColumns = [
@@ -45,6 +46,8 @@ const statusOptions = [
 
 
 const initialVisibleColumns = ["Status", "ApplicationId", "FirstName", "DOB", "Country", "RequestorEmail", "actions"];
+const initialVisibleUserColumns = ["email", "role", "actions"];
+
 const statusColorMap = {
     Approved: "success",
     Pending: "warning",
@@ -60,4 +63,4 @@ const dateOptions = {
     weekday: 'long',
 };
 
-export {columns, statusOptions, initialVisibleColumns, statusColorMap, dateOptions, userColumns};
+export {columns, statusOptions, initialVisibleUserColumns, initialVisibleColumns, statusColorMap, dateOptions, userColumns};
