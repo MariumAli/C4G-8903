@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import ResponsiveRecordsTable from '@/components/ResponsiveRecordsTable';
 import styles from '@/styles/Home.module.css'
-import styled from 'styled-components';
+import { Button, CircularProgress } from "@nextui-org/react";
 import { columns, initialVisibleColumns } from "@/data";
 
 
@@ -13,6 +13,7 @@ export default function AdminActions({ params }) {
     const { data: session, status } = useSession();
     const [allRecords, setAllRecords] = useState([]);
     const [userRole, setUserRole] = useState("invalid");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(
         () => {
@@ -34,6 +35,7 @@ export default function AdminActions({ params }) {
                     if (res_json.hasOwnProperty('result')) {
                         setUserRole(res_json["result"]);
                     }
+                    setIsLoading(false);
                 }
             }
             fetchUserRole();
@@ -143,7 +145,7 @@ export default function AdminActions({ params }) {
             }
         );
 
-    }    
+    }
 
     async function deleteApplication(record) {
 
@@ -186,28 +188,41 @@ export default function AdminActions({ params }) {
 
     }
 
-    if (status != "authenticated") {
+    if (isLoading) {
         return (
-            <main className={styles.main}>
-                <h1>Page Requires Authentication</h1>
-                <br></br>
-                <div className={styles.card}>
-                    <p>Navigate to the home page and sign-in first.</p>
-                    <br></br>
-                    <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
-                        Return Home
-                    </button>
-                </div>
-            </main>
-        )
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                }}
+            >
+                <CircularProgress
+                    classNames={{
+                        svg: "w-36 h-36 drop-shadow-md",
+                        positions: "center"
+                    }}
+                    strokeWidth={4}
+                    label={'Loading ...'}
+                    size="lg"
+                    color="warning"
+
+                />
+            </div>
+        );
     } else {
-        if (userRole != "admin") {
+
+        if (status != "authenticated") {
             return (
                 <main className={styles.main}>
-                    <h1>Insufficient Privileges {`(${userRole})`}</h1>
+                    <h1>Page Requires Authentication</h1>
                     <br></br>
                     <div className={styles.card}>
-                        <p>This page requires admin-level privileges to access, sign in with a different account with these privileges to use this page.</p>
+                        <p>Navigate to the home page and sign-in first.</p>
                         <br></br>
                         <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
                             Return Home
@@ -216,48 +231,68 @@ export default function AdminActions({ params }) {
                 </main>
             )
         } else {
-            return (
-                <main className={styles.auditmain}>
-                    <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Pending Requests in Admin Queue</h2>
+            if (userRole != "admin") {
+                return (
+                    <main className={styles.main}>
+                        <h1>Insufficient Privileges {`(${userRole})`}</h1>
+                        <br></br>
+                        <div className={styles.card}>
+                            <p>This page requires admin-level privileges to access, sign in with a different account with these privileges to use this page.</p>
+                            <br></br>
+                            <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
+                                Return Home
+                            </button>
+                        </div>
+                    </main>
+                )
+            } else {
+                return (
+                    <div className="flex flex-col flex-nowrap items-center text-base pb-10">
+                        <p className="flex font-mono font-medium text-6xl mt-10 mb-12"></p>
+                        <div className="flex flex-colflex-nowrap mt-15 items-center">
+                            <ResponsiveRecordsTable allRecords={allRecords}
+                                onUpdate={updateApplicationStatus}
+                                onDelete={deleteApplication}
+                                onEdit={editApplication}
+                                columns={columns}
+                                initialVisibleColumns={initialVisibleColumns}
+                                userRole={userRole} />
 
-                    <ResponsiveRecordsTable allRecords={allRecords} 
-                    onUpdate={updateApplicationStatus} 
-                    onDelete={deleteApplication} 
-                    onEdit={editApplication} 
-                    columns={columns}
-                    initialVisibleColumns={initialVisibleColumns}/>
+                        </div>
+                        {userRole == "admin" ? (
+                            <div className="flex flex-row w-full space-y-4 flex-nowrap items-center mt-15">
+                                <div className="flex text-base w-full space-y-4 flex-wrap flex-col items-center mt-10 pb-10">
+                                    <p className="flex font-mono font-medium text-base">Export Records</p>
+                                    <p className="flex font-mono font-medium text-sm">
+                                        {"Exports all Records to an Excel file"}
+                                    </p>
+                                    {/* Export Button Start */}
+                                    <Button color="primary">
+                                        <CSVLink id="download-records-form" filename={`records-${new Date().toDateString()}.csv`}
+                                            data={allRecords}>
+                                            Export Records to CSV
+                                        </CSVLink>
+                                    </Button>
+                                </div>
 
-                    <div className={styles.container}>
-                        <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Download Records</h2>
-                        <p style={{ marginTop: '10px', marginBottom: "10px" }}>
-                            {"Download all Records to an Excel file"}
-                        </p>
-                        {/* Export Button Start */}
-                        <CSVLink id="download-records-form" filename={`records-${new Date().toDateString()}.csv`}
-                            data={allRecords}
-                            className={styles.button}
-                            style={{ marginTop: '10px', marginBottom: "10px" }}>
-                            Export Records to CSV
-                        </CSVLink>
+                                <div className="flex text-base w-full space-y-4 flex-wrap flex-col items-center mt-10 pb-10">
+                                    <p className="flex font-mono font-medium text-base">Delete All Records</p>
+                                    <p className="flex font-mono font-medium text-sm">
+                                        {"Deletes all Records and resets the Database"}
+                                    </p>
+                                    <Button color="danger" onClick={(e) => submitDeleteAllRecords(e)}>
+                                        Delete All Records
+                                    </Button>
 
+                                </div>
+
+                            </div>
+                        )
+                            : ''
+                        }
                     </div>
-                    <div className={styles.container}>
-                        <h2 style={{ marginTop: '10px', marginBottom: "10px" }}>Delete All Records</h2>
-                        <p style={{ marginTop: '10px', marginBottom: "10px" }}>
-                            {"Deletes all Records and resets the Database"}
-                        </p>
-                        <button
-                            className={styles.button}
-                            style={{ marginTop: '10px', marginBottom: "10px" }}
-                            onClick={e => submitDeleteAllRecords(e)}
-                        >
-                            Delete All Records
-                        </button>
-
-
-                    </div>
-                </main>
-            );
+                )
+            }
         }
     }
 }

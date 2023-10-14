@@ -7,14 +7,17 @@ import {
     TableBody,
     TableRow,
     TableCell,
+    Tooltip,
     Input,
     Button,
     Pagination,
 } from "@nextui-org/react";
 import { SearchIcon } from "@/components/SearchIcon";
-import { userColumns } from "@/data";
+import { initialVisibleUserColumns, userColumns } from "@/data";
+import { DeleteIcon } from "@/components/DeleteIcon";
 
-export default function SimpleResponsiveTable({ allRecords }) {
+
+export default function SimpleResponsiveTable({ allRecords, onDelete, userRole }) {
     const router = useRouter();
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [sortDescriptor, setSortDescriptor] = React.useState({
@@ -26,6 +29,15 @@ export default function SimpleResponsiveTable({ allRecords }) {
     const [page, setPage] = React.useState(1);
 
     const hasEmailSearchFilter = Boolean(filterEmailValue);
+    const [visibleColumns, setVisibleColumns] = React.useState(new Set(initialVisibleUserColumns));
+
+
+    const headerColumns = React.useMemo(() => {
+        if (visibleColumns === "all") return userColumns;
+
+        return userColumns.filter((column) => Array.from(visibleColumns).includes(column.uid));
+    }, [visibleColumns]);
+
 
     const filteredItems = React.useMemo(() => {
         let filteredData = [...allRecords];
@@ -93,6 +105,34 @@ export default function SimpleResponsiveTable({ allRecords }) {
         setPage(1)
     }, [])
 
+    const renderCell = React.useCallback((record, columnKey) => {
+        switch (columnKey) {
+            case "actions":
+                return (
+                    <div className="relative flex items-center gap-2">
+                        {userRole == "admin" ? (
+                            <Tooltip color="danger" content="Delete Record">
+                                <span className="text-lg text-primary cursor-pointer active:opacity-50">
+                                    <Button className="text-lg text-default-400 cursor-pointer active:opacity-50" variant="outlined" onClick={() => onDelete(record)}>
+                                        <DeleteIcon />
+                                    </Button>
+                                </span>
+                            </Tooltip>
+                        ) : ''
+                        }
+                    </div>
+                );
+
+            default:
+                return (
+                    <div className="flex flex-col">
+                        <p>{record[columnKey]}</p>
+                    </div>
+                );
+        }
+    }, [onDelete]);
+
+
     const topContent = React.useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
@@ -135,7 +175,7 @@ export default function SimpleResponsiveTable({ allRecords }) {
         return (
             <div className="py-2 px-2 flex justify-between items-center">
                 <span className="w-[30%] text-small text-default-400">
-                    {`${allRecords.length} User records available`}
+                    {`Number of Users: ${allRecords.length}`}
                 </span>
                 <Pagination
                     isCompact
@@ -158,8 +198,6 @@ export default function SimpleResponsiveTable({ allRecords }) {
         );
     }, [page, pages, allRecords.length, onNextPage, onPreviousPage]);
 
-
-
     return (
 
         <Table
@@ -175,7 +213,7 @@ export default function SimpleResponsiveTable({ allRecords }) {
             topContentPlacement="outside"
             onSortChange={setSortDescriptor}
         >
-            <TableHeader classNames={{ description: "text-default-500", }} className="bg-white dark:bg-black" columns={userColumns}>
+            <TableHeader classNames={{ description: "text-default-500", }} className="items-center bg-white dark:bg-black" columns={headerColumns}>
                 {(column) => (
                     <TableColumn
                         key={column.uid}
@@ -186,6 +224,8 @@ export default function SimpleResponsiveTable({ allRecords }) {
                     </TableColumn>
                 )}
             </TableHeader>
+
+
             <TableBody className="text-lg bg-white dark:bg-black" emptyContent={"No records found"}>
                 {sortedItems.map((item, idx) => {
                     return (
@@ -195,11 +235,29 @@ export default function SimpleResponsiveTable({ allRecords }) {
                                     return (<TableCell key={`${idx}-${value}`}>{value}</TableCell>)
                                 })
                             }
+                            <TableCell key={`${idx}-actions`}>{renderCell(item, 'actions')}</TableCell>
+
                         </TableRow>
                     )
                 })
                 }
             </TableBody>
+
+            {/* <TableBody className="text-lg bg-white dark:bg-black" emptyContent={"No records found"}>
+                {sortedItems.map((item, idx) => {
+                    return (
+                        <TableRow key={idx}>
+                            {
+                                Object.entries(item).map((columnKey, value) => {
+                                    return (<TableCell key={`${idx}-${value}`}>{renderCell(value, columnKey)}</TableCell>)
+
+                                })
+                            }
+                        </TableRow>
+                    )
+                })
+                }
+            </TableBody> */}
         </Table>
 
 

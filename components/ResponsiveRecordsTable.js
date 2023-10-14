@@ -29,7 +29,7 @@ import { capitalize } from "@/utils";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 
-export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit }) {
+export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit, userRole }) {
     const router = useRouter();
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
@@ -162,20 +162,26 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                                 </Button>
                             </span>
                         </Tooltip>
-                        <Tooltip color="primary" content="Edit Record">
-                            <span className="text-lg text-primary cursor-pointer active:opacity-50">
-                                <Button className="text-lg text-default-400 cursor-pointer active:opacity-50" variant="outlined" onClick={() => onEdit(record)}>
-                                    <EditIcon />
-                                </Button>
-                            </span>
-                        </Tooltip>
 
                         {record["Status"] == "Pending" || record["Status"] == "Pending - Agent Action" || record["Status"] == "Pending - Admin Action" ?
-                            (<Tooltip content="Approve Record">
-                                <Button className="text-lg text-default-400 cursor-pointer active:opacity-50" variant="outlined" onClick={() => onUpdate(record, "Approved")}>
-                                    <CheckIcon />
-                                </Button>
-                            </Tooltip>
+                            (
+                                <>
+                                    <Tooltip color="primary" content="Edit Record">
+                                        <span className="text-lg text-primary cursor-pointer active:opacity-50">
+                                            <Button className="text-lg text-default-400 cursor-pointer active:opacity-50" variant="outlined" onClick={() => onEdit(record)}>
+                                                <EditIcon />
+                                            </Button>
+                                        </span>
+                                    </Tooltip>
+                                    {userRole == "admin" ? (
+                                        <Tooltip content="Approve Record">
+                                            <Button className="text-lg text-default-400 cursor-pointer active:opacity-50" variant="outlined" onClick={() => onUpdate(record, "Approved")}>
+                                                <CheckIcon />
+                                            </Button>
+                                        </Tooltip>
+                                    ) : ''
+                                    }
+                                </>
                             ) : ""}
                     </div>
                 );

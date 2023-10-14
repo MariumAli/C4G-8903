@@ -9,8 +9,8 @@ const MENU_LIST = [
   { text: "About", href: "/about" },
   { text: "Audit", href: "/audit" },
   { text: "Users", href: "/users" },
-  { text: "Admin Actions", href: "/admin_actions" },
-  { text: "Agent Actions", href: "/agent_actions" },
+  // { text: "Admin Actions", href: "/admin_actions" },
+  // { text: "Agent Actions", href: "/agent_actions" },
   // { text: "GitHub", href: "https://github.com/AndrewSpittlemeister/c4g-efsp-front-end" },
   // { text: "Survey", href: "https://forms.office.com/Pages/ResponsePage.aspx?id=u5ghSHuuJUuLem1_Mvqgg77XCbGawB9Gl_Mb2IsliK9UQ0tBTjQzNk1PWFA1R0FTUEQyRFRTNkdQQS4u"},
 ];
