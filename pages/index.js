@@ -2,6 +2,9 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useSession, signIn } from "next-auth/react"
 import { useRouter } from 'next/router';
+import { Card, CardBody, Button, CardHeader } from "@nextui-org/react";
+import { PlusIcon } from "@/components/PlusIcon";
+
 
 const WELCOME_MESSAGE = "\
 Welcome to the United Way of Metro Atlanta - \
@@ -28,30 +31,48 @@ export default function Home() {
   return (
     <>
       <main className={styles.main}>
-        <h1>{WELCOME_MESSAGE}</h1>
-        <div className={styles.card}>{WELCOME_PROMPT}</div>
+        <Card>
+          <CardBody>
+            <p>{WELCOME_MESSAGE}</p>
+          </CardBody>
+        </Card>
+
+        <br></br>
+        <br></br>
+
+        <Card>
+          <CardBody>
+            <p>{WELCOME_PROMPT}</p>
+          </CardBody>
+        </Card>
+        <br></br>
+        <br></br>
+
         {
           status == "authenticated" ? (
-            <div className={styles.card}>
-              <p>
+            <Card>
+              <CardHeader>
                 Click below to display a form for submitting a new application.
-              </p>
-              <br></br>
-              <button className={styles.button} style={{margin: 'auto'}} onClick={() => router.push('/form')}>
-                Process New Application
-              </button>
-            </div>
+              </CardHeader>
+              <CardBody className="flex gap-3">
+
+                <Button className="text-lg" color="primary" startContent={<PlusIcon />} onClick={() => router.push('/form')}>
+                  Process New Application
+                </Button>
+
+              </CardBody>
+            </Card>
           ) : (
             <div className={styles.card}>
               <p>
                 Click below to sign in with your Gmail user account.
               </p>
               <br></br>
-              <button className={styles.button} style={{margin: 'auto'}} onClick={() => signIn()}>
+              <button className={styles.button} style={{ margin: 'auto' }} onClick={() => signIn()}>
                 Sign In
               </button>
             </div>
-            
+
           )
         }
       </main>
