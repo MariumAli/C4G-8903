@@ -36,7 +36,6 @@ export default function Audit({ params }) {
                     if (res_json.hasOwnProperty('result')) {
                         setUserRole(res_json["result"]);
                     }
-                    setIsLoading(false);
                 }
             }
             fetchUserRole();
@@ -48,7 +47,7 @@ export default function Audit({ params }) {
     useEffect(
         () => {
             async function getAllRecords() {
-                if (router.isReady && session && session.user) {
+                if (router.isReady && session && session.user && userRole) {
 
                     if (userRole != "admin") {
                         let records_res = await fetch(
@@ -64,6 +63,7 @@ export default function Audit({ params }) {
 
                         console.log("Setting All Applicant Records for email");
                         setAllRecords(records.result);
+                        setIsLoading(false);
                     } else {
                         let records_res = await fetch(
                             `/api/gatherAllRecords`,
@@ -78,15 +78,17 @@ export default function Audit({ params }) {
 
                         console.log("Setting All Applicant Records for admin");
                         setAllRecords(records.result);
+                        setIsLoading(false);
                     }
                 } else {
                     setAllRecords([]);
+                    setIsLoading(false);
                 }
             }
 
             getAllRecords();
         },
-        [router.isReady, status, session]
+        [router.isReady, status, session, userRole]
     );
 
 
@@ -208,10 +210,10 @@ export default function Audit({ params }) {
             </main>
         )
     } else {
-        return (
+        return (userRole ? (
             <div className="flex w-full flex-col flex-nowrap items-center text-base ">
                 <p className="flex font-mono font-medium text-6xl mt-10 mb-12"></p>
-                <div className="flex flex-colflex-nowrap mt-15 items-center">
+                <div className="flex flex-col flex-nowrap mt-15 items-center">
                     <ResponsiveRecordsTable allRecords={allRecords}
                         onUpdate={updateApplicationStatus}
                         onDelete={deleteApplication}
@@ -253,6 +255,7 @@ export default function Audit({ params }) {
                     : ''
                 }
             </div>
+        ) : ''
         );
     }
 }
