@@ -2,7 +2,7 @@ import executeQuery from "@/lib/db";
 
 
 export default async function handler(req, res) {
-    console.log("inAddApplication with query params:");
+    console.log("in AddApplication with query params:");
     console.log(req.query);
 
     let addedRecord = [];
@@ -54,7 +54,8 @@ export default async function handler(req, res) {
             console.log(application_db_result.insertId);
             addedRecord.push(
                 {
-                    success: application_db_result.insertId != undefined
+                    success: application_db_result.insertId != undefined,
+                    insertId: application_db_result.insertId
 
                 }
             );

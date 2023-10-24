@@ -29,7 +29,9 @@ import { capitalize } from "@/utils";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 
-export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit, userRole }) {
+
+
+export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit, userRole, householdMembers }) {
     const router = useRouter();
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
@@ -37,18 +39,46 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
     const [statusFilter, setStatusFilter] = React.useState("all");
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [openedRow, setOpenedRow] = React.useState(null);
+    const [selectedApplicantHouseholdMembers, setSelectedApplicantHouseholdMembers] = React.useState([]);
     const [sortDescriptor, setSortDescriptor] = React.useState({
         column: "ApplicationID",
         direction: "ascending",
     });
     const [filterEmailValue, setFilterEmailValue] = React.useState("");
+    const { isOpen, onOpen, onClose, } = useDisclosure();
 
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    // console.log('inside responsive table');
+    // console.log(allRecords);
+
+    React.useEffect(
+        () => {
+            async function getHouseHoldMembers() {
+                // console.log("Lets get household member info for applicant: ");
+                // console.log(openedRow);
+                let res_household_members = await fetch(
+                    `/api/getHouseHoldMembers?applicantId=${openedRow.ApplicationId}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "accept": "application/json",
+                        },
+                    },
+                );
+                let household_members = await res_household_members.json();
+
+                // console.log("Setting HouseHold Members for selected applicant");
+                // console.log(household_members);
+                setSelectedApplicantHouseholdMembers(household_members.result);
+                onOpen();
+            }
+            getHouseHoldMembers();
+        },
+        [openedRow]
+    );
 
     const handleOpen = React.useCallback((record) => {
         setOpenedRow(record);
-        onOpen();
     }, [onOpen]);
 
     const [page, setPage] = React.useState(1);
@@ -98,6 +128,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
     }, [page, filteredItems, rowsPerPage]);
 
     const sortedItems = React.useMemo(() => {
+        let isDate = sortDescriptor.column == "DecisionDate" || sortDescriptor.column == "DOB" || sortDescriptor.column == "RequestDate"
         return [...items].sort((a, b) => {
             const first = a[sortDescriptor.column];
             const second = b[sortDescriptor.column];
@@ -124,7 +155,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                     </div>
                 );
             case "Status":
-                var date = record?.ApprovalDate != undefined ? new Date(record["ApprovalDate"]) : null;
+                var date = record?.DecisionDate != undefined ? new Date(record["DecisionDate"]) : null;
                 return (
                     <div className="flex flex-col">
                         <Chip className="capitalize" color={statusColorMap[record[columnKey]]} size="sm" variant="flat">
@@ -265,11 +296,15 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                     />
                     <div className="flex gap-3">
                         <Dropdown>
-                            <DropdownTrigger className="hidden sm:flex">
-                                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                                    Status
-                                </Button>
-                            </DropdownTrigger>
+                            <Tooltip showArrow={true} content="Use this Status Dropdown to Filter Pending Requests">
+                                <div>
+                                    <DropdownTrigger className="hidden sm:flex">
+                                        <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                                            Status
+                                        </Button>
+                                    </DropdownTrigger>
+                                </div>
+                            </Tooltip>
                             <DropdownMenu
                                 disallowEmptySelection
                                 aria-label="Table Columns"
@@ -286,11 +321,15 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                             </DropdownMenu>
                         </Dropdown>
                         <Dropdown>
-                            <DropdownTrigger className="hidden sm:flex">
-                                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                                    Columns
-                                </Button>
-                            </DropdownTrigger>
+                            <Tooltip showArrow={true} content="Use this Columns Dropdown too Add or Remove Columns From Table View">
+                                <div>
+                                    <DropdownTrigger className="hidden sm:flex">
+                                        <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                                            Columns
+                                        </Button>
+                                    </DropdownTrigger>
+                                </div>
+                            </Tooltip>
                             <DropdownMenu
                                 disallowEmptySelection
                                 aria-label="Table Columns"
@@ -371,14 +410,14 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
     }, [selectedKeys, page, pages, filteredItems.length, onNextPage, onPreviousPage]);
 
     return (
-        <div>
+        <div className="max-w-full min-w-full">
             <Table
                 aria-label="All Records"
                 isHeaderSticky
                 bottomContent={bottomContent}
                 bottomContentPlacement="outside"
                 classNames={{
-                    wrapper: "max-h-[1200px]",
+                    wrapper: "max-h-[1200px] max-w-full	min-w-full",
                 }}
                 selectedKeys={selectedKeys}
                 selectionMode="multiple"
@@ -415,9 +454,10 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                         backdrop={'blur'}
                         isOpen={isOpen}
                         onClose={onClose}
-                        scrollBehavior={'inside'}
+                        scrollBehavior={'outside'}
                         placement={'center'}
                         size={'5xl'}
+                        className="py-4"
                     >
                         <ModalContent>
                             {(onClose) => (
@@ -437,19 +477,15 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                                                 <div align="left"><b>Comments:</b> {openedRow.StatusComments}</div>
                                                 <div align="left"><b>Requestor Email:</b> {openedRow.RequestorEmail}</div>
                                                 <div align="left"><b>Request Date:</b> {new Date(openedRow.RequestDate).toLocaleDateString('en-US', dateOptions)}</div>
-                                                <div align="left"><b>Decision Date:</b> {openedRow.ApprovalDate ? new Date(openedRow.ApprovalDate).toLocaleDateString('en-US', dateOptions) : ''}</div>
-                                            </CardBody>
-                                            <Divider />
+                                                <div align="left"><b>Decision Date:</b> {openedRow.DecisionDate ? new Date(openedRow.DecisionDate).toLocaleDateString('en-US', dateOptions) : ''}</div>
+                                                <Divider className="my-4" />
 
-                                            <CardBody >
                                                 <div align="left"><b>Full Name:</b> {openedRow.FirstName} {openedRow.MiddleName} {openedRow.LastName}</div>
                                                 <div align="left"><b>Date of Birth:</b> {new Date(openedRow.DOB).toLocaleDateString('en-US', dateOptions)}</div>
                                                 <div align="left"><b>Address:</b> {openedRow.StreetAddress}, {openedRow.PostalCode}. {openedRow.City}, {openedRow.Country}.
                                                 </div>
-                                            </CardBody>
-                                            <Divider />
+                                                <Divider className="my-4" />
 
-                                            <CardBody fontSize={'1.15rem'}>
                                                 <div align="left"><b>LRO Number:</b> {openedRow.LRONumber}</div>
                                                 <div align="left"><b>LRO Agency Name:</b> {openedRow.LROAgencyName}</div>
                                                 <div align="left"><b>LRO Email:</b> {openedRow.LROEmail}</div>
@@ -466,15 +502,35 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                                                 <div align="left"><b>LRO Monthly Electricity Amount</b> ${openedRow.MonthlyElectricityAmt_LRO}</div>
                                                 <div align="left"><b>Monthly Water Amount:</b> ${openedRow.MonthlyWaterAmt}</div>
                                                 <div align="left"><b>LRO Monthly Water Amount:</b> ${openedRow.MonthlyWaterAmt_LRO}</div>
-                                            </CardBody>
-                                            <Divider />
+                                                <Divider className="my-4" />
 
-                                            <CardBody>
                                                 <div align="left"><b>Funding Phase:</b> {openedRow.FundingPhase}</div>
                                                 <div align="left"><b>Jurisdiction:</b> {openedRow.Jurisdiction}</div>
                                                 <div align="left"><b>Payment Vendor:</b> {openedRow.PaymentVendor}</div>
                                             </CardBody>
                                         </Card>
+
+                                        {
+                                            selectedApplicantHouseholdMembers.length > 0 && <p className='flex justify-center font-mono uppercase text-black text-center font-bold text-xl'>
+                                                HouseHold Members
+                                            </p>
+                                        }
+                                        {selectedApplicantHouseholdMembers.map(
+                                            (member) => {
+                                                return (
+                                                    <div key={member.identity}>
+                                                        <Card key={member.identity} >
+                                                            <CardBody>
+                                                                <div align="left"><b>Full Name:</b> {member.FirstName} {member.MiddleName} {member.LastName}</div>
+                                                                <div align="left"><b>Date of Birth:</b> {new Date(member.DOB).toLocaleDateString('en-US', dateOptions)}</div>
+                                                            </CardBody>
+                                                        </Card>
+                                                    </div>
+
+                                                );
+                                            }
+                                        )}
+
                                     </ModalBody>
                                     {openedRow.Status == "Pending" ? (
                                         <ModalFooter>

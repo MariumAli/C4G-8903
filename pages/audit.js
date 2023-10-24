@@ -12,6 +12,7 @@ export default function Audit({ params }) {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [allRecords, setAllRecords] = useState([]);
+    const [allRecordsWithHouseholdMembers, setAllRecordsWithHouseholdMembers] = useState([]);
     const [userRole, setUserRole] = useState("invalid");
     const [isLoading, setIsLoading] = useState(true);
 
@@ -19,7 +20,7 @@ export default function Audit({ params }) {
     useEffect(
         () => {
             async function fetchUserRole() {
-                if ((router.isReady) && (status === "authenticated")) {
+                if ((router.isReady) && session && session.user && session.user.email && (status === "authenticated")) {
                     let res = await fetch(
                         `/api/getUserRole?email=${session.user.email}`,
                         {
@@ -47,7 +48,7 @@ export default function Audit({ params }) {
     useEffect(
         () => {
             async function getAllRecords() {
-                if (router.isReady && session && session.user && userRole) {
+                if (router.isReady && session && session.user && session.user.email && userRole) {
 
                     if (userRole != "admin") {
                         let records_res = await fetch(
@@ -62,6 +63,7 @@ export default function Audit({ params }) {
                         let records = await records_res.json();
 
                         console.log("Setting All Applicant Records for email");
+                        console.log(records.result);
                         setAllRecords(records.result);
                         setIsLoading(false);
                     } else {
@@ -91,6 +93,36 @@ export default function Audit({ params }) {
         [router.isReady, status, session, userRole]
     );
 
+
+
+    useEffect(
+        () => {
+            async function getAllRecordsWithHouseholdMembers() {
+                if (router.isReady && session && session.user && session.user.email && userRole) {
+
+                    if (userRole == "admin") {
+                        let records_res = await fetch(
+                            `/api/gatherAllRecordsWithHouseholdMembers`,
+                            {
+                                method: "GET",
+                                headers: {
+                                    "accept": "application/json",
+                                },
+                            },
+                        );
+                        let records = await records_res.json();
+
+                        console.log("Setting All Applicant Records for email");
+                        console.log(records.result);
+                        setAllRecordsWithHouseholdMembers(records.result);
+                    } 
+                }
+            }
+
+            getAllRecordsWithHouseholdMembers();
+        },
+        [router.isReady, status, session, userRole]
+    );
 
     async function updateApplicationStatus(record) {
 
@@ -128,6 +160,27 @@ export default function Audit({ params }) {
         );
         let res_json = await res.json();
         console.log(`remove record call response status: ${res.status}`);
+        alert(res_json.result);
+
+        window.location.reload();
+    }
+
+    const submitDeleteAllRecords = async (e) => {
+        // We don't want the page to refresh
+        e.preventDefault();
+
+        let res = await fetch(
+            `/api/removeAllRecords`,
+            {
+                method: "DELETE",
+                headers: {
+                    "accept": "application/json",
+                },
+                body: { id: '*' }
+            },
+        );
+        let res_json = await res.json();
+        console.log(`Remove all record call response status: ${res.status}`);
         alert(res_json.result);
 
         window.location.reload();
@@ -233,7 +286,7 @@ export default function Audit({ params }) {
                             {/* Export Button Start */}
                             <Button color="primary">
                                 <CSVLink id="download-records-form" filename={`records-${new Date().toDateString()}.csv`}
-                                    data={allRecords}>
+                                    data={allRecordsWithHouseholdMembers}>
                                     Export Records to CSV
                                 </CSVLink>
                             </Button>

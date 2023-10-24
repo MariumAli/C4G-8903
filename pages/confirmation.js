@@ -20,6 +20,7 @@ export default function ConfirmationPage({ params }) {
     const [addRecordSuccess, setAddRecordSuccess] = useState(false);
     const [userRole, setUserRole] = useState("invalid");
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedApplicantHouseholdMembers, setSelectedApplicantHouseholdMembers] = React.useState([]);
 
     const [formData, setFormData] = useState({
         statusComments: "",
@@ -53,6 +54,30 @@ export default function ConfirmationPage({ params }) {
         [router.isReady, status, session]
     );
 
+    React.useEffect(
+        () => {
+            async function getHouseHoldMembers() {
+                console.log("Lets get household member info for applicant: ");
+                console.log(data);
+                let res_household_members = await fetch(
+                    `/api/getHouseHoldMembers?applicantId=${data.ApplicationId}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "accept": "application/json",
+                        },
+                    },
+                );
+                let household_members = await res_household_members.json();
+
+                console.log("Setting HouseHold Members for selected applicant");
+                console.log(household_members);
+                setSelectedApplicantHouseholdMembers(household_members.result);
+            }
+            getHouseHoldMembers();
+        },
+        [data]
+    );
     // gather similar records from the database
     useEffect(
         () => {
@@ -348,20 +373,12 @@ export default function ConfirmationPage({ params }) {
                                 <div align="left"><b>Status Comments:</b> {data.StatusComments}</div>
                                 <div align="left"><b>Requestor Email:</b> {data.RequestorEmail}</div>
                                 <div align="left"><b>Request Date:</b> {new Date(data.RequestDate).toLocaleDateString('en-US', dateOptions)}</div>
-
-
-                            </CardBody>
-                            <Divider />
-
-                            <CardBody>
+                                <Divider className="my-4" />
                                 <div align="left"><b>Full Name:</b> {data.FirstName} {data.MiddleName} {data.LastName}</div>
                                 <div align="left"><b>Date of Birth:</b> {new Date(data.DOB).toLocaleDateString('en-US', dateOptions)}</div>
                                 <div align="left"><b>Address:</b> {data.StreetAddress}, {data.PostalCode}.{data.City}, {data.Country}.
                                 </div>
-                            </CardBody>
-                            <Divider />
-
-                            <CardBody fontSize={'1.15rem'}>
+                                <Divider className="my-4" />
                                 <div align="left"><b>LRO Number:</b> {data.LRONumber}</div>
                                 <div align="left"><b>LRO Agency Name:</b> {data.LROAgencyName}</div>
                                 <div align="left"><b>LRO Email:</b> {data.LROEmail}</div>
@@ -378,15 +395,35 @@ export default function ConfirmationPage({ params }) {
                                 <div align="left"><b>LRO Monthly Electricity Amount</b> ${data.MonthlyElectricityAmt_LRO}</div>
                                 <div align="left"><b>Monthly Water Amount:</b> ${data.MonthlyWaterAmt}</div>
                                 <div align="left"><b>LRO Monthly Water Amount:</b> ${data.MonthlyWaterAmt_LRO}</div>
-                            </CardBody>
-                            <Divider />
-
-                            <CardBody>
+                                <Divider className="my-4" />
                                 <div align="left"><b>Funding Phase:</b> {data.FundingPhase}</div>
                                 <div align="left"><b>Jurisdiction:</b> {data.Jurisdiction}</div>
                                 <div align="left"><b>Payment Vendor:</b> {data.PaymentVendor}</div>
+                                {
+                                    selectedApplicantHouseholdMembers.length > 0 && <p className='flex justify-center font-mono uppercase text-black text-center font-bold text-xl'>
+                                        HouseHold Members
+                                    </p>
+                                }
+                                {selectedApplicantHouseholdMembers.map(
+                                    (member) => {
+                                        return (
+                                            <div key={member.identity}>
+                                                <Divider className="my-4" />
+
+                                                <Card key={member.identity} >
+                                                    <CardBody>
+                                                        <div align="left"><b>Full Name:</b> {member.FirstName} {member.MiddleName} {member.LastName}</div>
+                                                        <div align="left"><b>Date of Birth:</b> {new Date(member.DOB).toLocaleDateString('en-US', dateOptions)}</div>
+                                                    </CardBody>
+                                                </Card>
+                                            </div>
+
+                                        );
+                                    }
+                                )}
                             </CardBody>
                         </Card>
+
                     </div>
 
 
@@ -413,11 +450,7 @@ export default function ConfirmationPage({ params }) {
                                                                 <div align="left"><b>Full Name:</b> {name}</div>
                                                                 <div align="left"><b>Date of Birth:</b> {dob}</div>
                                                                 <div align="left"><b>Request Date:</b> {data.date}</div>
-
-                                                            </CardBody>
-                                                            <Divider />
-
-                                                            <CardBody fontSize={'1.15rem'}>
+                                                                <Divider />
                                                                 <div align="left"><b>LRO Number:</b> {application.lroNumber}</div>
                                                                 <div align="left"><b>LRO Agency Name:</b> {application.agency}</div>
                                                                 <div align="left"><b>LRO Email:</b> {application.lroEmail}</div>
@@ -434,10 +467,7 @@ export default function ConfirmationPage({ params }) {
                                                                 <div align="left"><b>LRO Monthly Electricity Amount</b> ${application.electricLRO}</div>
                                                                 <div align="left"><b>Monthly Water Amount:</b> ${application.water}</div>
                                                                 <div align="left"><b>LRO Monthly Water Amount:</b> ${application.waterLRO}</div>
-                                                            </CardBody>
-                                                            <Divider />
-
-                                                            <CardBody>
+                                                                <Divider />
                                                                 <div align="left"><b>Funding Phase:</b> {formData.fundingPhase}</div>
                                                                 <div align="left"><b>Jurisdiction:</b> {formData.jurisdiction}</div>
                                                                 <div align="left"><b>Payment Vendor:</b> {formData.paymentVendor}</div>
@@ -480,11 +510,7 @@ export default function ConfirmationPage({ params }) {
                                                                 <div align="left"><b>Full Name:</b> {name}</div>
                                                                 <div align="left"><b>Date of Birth:</b> {dob}</div>
                                                                 <div align="left"><b>Request Date:</b> {data.date}</div>
-
-                                                            </CardBody>
-                                                            <Divider />
-
-                                                            <CardBody fontSize={'1.15rem'}>
+                                                                <Divider />
                                                                 <div align="left"><b>LRO Number:</b> {application.lroNumber}</div>
                                                                 <div align="left"><b>LRO Agency Name:</b> {application.agency}</div>
                                                                 <div align="left"><b>LRO Email:</b> {application.lroEmail}</div>
@@ -501,10 +527,7 @@ export default function ConfirmationPage({ params }) {
                                                                 <div align="left"><b>LRO Monthly Electricity Amount</b> ${application.electricLRO}</div>
                                                                 <div align="left"><b>Monthly Water Amount:</b> ${application.water}</div>
                                                                 <div align="left"><b>LRO Monthly Water Amount:</b> ${application.waterLRO}</div>
-                                                            </CardBody>
-                                                            <Divider />
-
-                                                            <CardBody>
+                                                                <Divider />
                                                                 <div align="left"><b>Funding Phase:</b> {application.fundingPhase}</div>
                                                                 <div align="left"><b>Jurisdiction:</b> {application.jurisdiction}</div>
                                                                 <div align="left"><b>Payment Vendor:</b> {application.paymentVendor}</div>
