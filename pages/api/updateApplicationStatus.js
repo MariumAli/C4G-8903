@@ -6,8 +6,8 @@ export default async function handler(req, res) {
         try {
             const db_result = await executeQuery(
                 {
-                    query: "UPDATE Application_Applicant_LRO SET Status = ?, StatusComments = ? WHERE `Application_Applicant_LRO`.`ApplicationId` = ?",
-                    values: [req.query.status, req.query.statusComments, req.query.applicationId]
+                    query: "UPDATE Application_Applicant_LRO SET Status = ?, StatusComments = ?, DecisionDate = ? WHERE `Application_Applicant_LRO`.`ApplicationId` = ?",
+                    values: [req.query.status, req.query.statusComments, new Date().toDateString(),  req.query.applicationId]
                 }
             );
 

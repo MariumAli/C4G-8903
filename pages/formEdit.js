@@ -62,6 +62,32 @@ export default function Contact() {
     const [addRecordSuccess, setAddRecordSuccess] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
+
+    React.useEffect(
+        () => {
+            async function getHouseHoldMembers() {
+                console.log("Lets get household member info for applicant: ");
+                console.log(currentData);
+                let res_household_members = await fetch(
+                    `/api/getHouseHoldMembers?applicantId=${currentData.ApplicationId}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "accept": "application/json",
+                        },
+                    },
+                );
+                let household_members = await res_household_members.json();
+
+                console.log("Setting HouseHold Members for selected applicant");
+                console.log(household_members);
+                setHouseholdMembers(household_members.result);
+            }
+            getHouseHoldMembers();
+        },
+        [currentData]
+    );
+
     const handleOpen = React.useCallback(() => {
         onOpen();
     }, [onOpen]);
@@ -95,7 +121,7 @@ export default function Contact() {
     );
 
     async function addMember() {
-        setHouseholdMembers([...householdMembers, { firstName: "", middleName: "", lastName: "", dob: "" }]);
+        setHouseholdMembers([...householdMembers, { FirstName: "", MiddleName: "", LastName: "", DOB: "" }]);
     }
 
     const handleInput = (e) => {
@@ -176,11 +202,62 @@ export default function Contact() {
             );
             let records = await add_res.json();
             addRecordSuccessValue = records.result[0].success;
+
+            console.log('updating household members');
+            // console.log(householdMembers);
+
+            for (let i = 0; i < householdMembers.length; i++) {
+                if (householdMembers[i].HouseholdMemberId != null) {
+                    console.log("This household member is old");
+                    console.log(householdMembers[i]);
+                    let add_res = await fetch(`/api/editHouseHoldMember?householdMemberDOB=${householdMembers[i].DOB}`
+                        + `&householdMemberFirstName=${householdMembers[i].FirstName}`
+                        + `&householdMemberLastName=${householdMembers[i].LastName}`
+                        + `&householdMemberMiddleName=${householdMembers[i].MiddleName}`
+                        + `&householdMemberId=${householdMembers[i].HouseholdMemberId}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "accept": "application/json",
+                            },
+                        }
+                    );
+
+                    let records = await add_res.json();
+                    // console.log('edited household member result');
+                    // console.log(records);
+                    addRecordSuccessValue = addRecordSuccessValue && records.result[0].success;
+                }
+                else {
+                    // console.log("This household member is new");
+                    // console.log(householdMembers[i]);
+                    let household_add_res = await fetch(
+                        `/api/addHouseHoldMember?householdMemberApplicantId=${formData.applicationId}`
+                        + `&householdMemberDOB=${householdMembers[i].DOB}`
+                        + `&householdMemberFirstName=${householdMembers[i].FirstName}`
+                        + `&householdMemberLastName=${householdMembers[i].LastName}`
+                        + `&householdMemberMiddleName=${householdMembers[i].MiddleName}`
+                        ,
+                        {
+                            method: "POST",
+                            headers: {
+                                "accept": "application/json",
+                            },
+                        },
+                    );
+                    records = await household_add_res.json();
+                    // console.log('edited household member result');
+                    // console.log(records);
+                    addRecordSuccessValue = addRecordSuccessValue && records.result[0].success;
+                }
+            }
+            setAddRecordSuccess(addRecordSuccessValue);
+            console.log(`Edit Submitted, Success: ${addRecordSuccessValue}`);
+            handleOpen();
         }
-        setAddRecordSuccess(addRecordSuccessValue);
-        console.log(`Edit Submitted, Success: ${addRecordSuccessValue}`);
-        handleOpen();
     }
+
+
     if (status != "authenticated") {
         return (
             <main className={styles.main}>
@@ -791,11 +868,11 @@ export default function Contact() {
                                                         labelPlacement="outside"
                                                         isRequired
                                                         isClearable
-                                                        value={element.firstName}
-                                                        name="firstName"
+                                                        value={element.FirstName}
+                                                        name="FirstName"
                                                         onClear={(index) => {
                                                             let newHouseholdMembers = [...householdMembers];
-                                                            newHouseholdMembers[index]["firstName"] = '';
+                                                            newHouseholdMembers[index]["FirstName"] = '';
                                                             setHouseholdMembers(newHouseholdMembers);
                                                         }}
                                                         onChange={e => handleMemberInput(index, e)} />
@@ -805,11 +882,11 @@ export default function Contact() {
                                                         placeholder="Enter Middle Name"
                                                         labelPlacement="outside"
                                                         isClearable
-                                                        value={element.middleName}
-                                                        name="middleName"
+                                                        value={element.MiddleName}
+                                                        name="MiddleName"
                                                         onClear={(index) => {
                                                             let newHouseholdMembers = [...householdMembers];
-                                                            newHouseholdMembers[index]["middleName"] = '';
+                                                            newHouseholdMembers[index]["MiddleName"] = '';
                                                             setHouseholdMembers(newHouseholdMembers);
                                                         }}
                                                         onChange={e => handleMemberInput(index, e)} />
@@ -820,11 +897,11 @@ export default function Contact() {
                                                         labelPlacement="outside"
                                                         isRequired
                                                         isClearable
-                                                        value={element.lastName}
-                                                        name="lastName"
+                                                        value={element.LastName}
+                                                        name="LastName"
                                                         onClear={(index) => {
                                                             let newHouseholdMembers = [...householdMembers];
-                                                            newHouseholdMembers[index]["lastName"] = '';
+                                                            newHouseholdMembers[index]["LastName"] = '';
                                                             setHouseholdMembers(newHouseholdMembers);
                                                         }}
                                                         onChange={e => handleMemberInput(index, e)} />
@@ -835,11 +912,11 @@ export default function Contact() {
                                                         labelPlacement="outside"
                                                         isRequired
                                                         isClearable
-                                                        value={element.dob}
-                                                        name="dob"
+                                                        value={moment(element.DOB).format("YYYY-MM-DD")}
+                                                        name="DOB"
                                                         onClear={(index) => {
                                                             let newHouseholdMembers = [...householdMembers];
-                                                            newHouseholdMembers[index]["dob"] = '';
+                                                            newHouseholdMembers[index]["DOB"] = '';
                                                             setHouseholdMembers(newHouseholdMembers);
                                                         }}
                                                         onChange={e => handleMemberInput(index, e)} />
@@ -870,6 +947,7 @@ export default function Contact() {
                                     onClose={onClose}
                                     isDismissable={false}
                                     hideCloseButton={true}
+                                    className="py-4"
                                 >
                                     <ModalContent>
                                         {(onClose) => (
@@ -888,20 +966,12 @@ export default function Contact() {
                                                             </div>
                                                             <div align="left"><b>Requestor Email:</b> {session.user.email}</div>
                                                             <div align="left"><b>Request Date:</b> {new Date().toLocaleDateString('en-US', dateOptions)}</div>
-
-
-                                                        </CardBody>
-                                                        <Divider />
-
-                                                        <CardBody >
+                                                            <Divider className="my-4" />
                                                             <div align="left"><b>Full Name:</b> {formData.applicantFirstName} {formData.applicantMiddleName} {formData.applicantLastName}</div>
                                                             <div align="left"><b>Date of Birth:</b> {new Date(formData.applicantDOB).toLocaleDateString('en-US', dateOptions)}</div>
                                                             <div align="left"><b>Address:</b> {formData.applicantStreetAddress}, {formData.applicantPostalCode}. {formData.applicantCity}, {formData.applicantCountry}.
                                                             </div>
-                                                        </CardBody>
-                                                        <Divider />
-
-                                                        <CardBody fontSize={'1.15rem'}>
+                                                            <Divider className="my-4" />
                                                             <div align="left"><b>LRO Number:</b> {formData.lroNumber}</div>
                                                             <div align="left"><b>LRO Agency Name:</b> {formData.agencyName}</div>
                                                             <div align="left"><b>LRO Email:</b> {formData.lroEmail}</div>
@@ -918,15 +988,32 @@ export default function Contact() {
                                                             <div align="left"><b>LRO Monthly Electricity Amount</b> ${formData.monthlyElectricLRO}</div>
                                                             <div align="left"><b>Monthly Water Amount:</b> ${formData.monthlyWater}</div>
                                                             <div align="left"><b>LRO Monthly Water Amount:</b> ${formData.monthlyWaterLRO}</div>
-                                                        </CardBody>
-                                                        <Divider />
-
-                                                        <CardBody>
+                                                            <Divider className="my-4" />
                                                             <div align="left"><b>Funding Phase:</b> {formData.fundingPhase}</div>
                                                             <div align="left"><b>Jurisdiction:</b> {formData.jurisdiction}</div>
                                                             <div align="left"><b>Payment Vendor:</b> {formData.paymentVendor}</div>
                                                         </CardBody>
                                                     </Card>
+                                                    {
+                                                        householdMembers.length > 0 && <p className='flex justify-center font-mono uppercase text-black text-center font-bold text-xl'>
+                                                            HouseHold Members
+                                                        </p>
+                                                    }
+                                                    {householdMembers.map(
+                                                        (member, index) => {
+                                                            return (
+                                                                <div key={index}>
+                                                                    <Card key={index}>
+                                                                        <CardBody>
+                                                                            <div align="left"><b>Full Name:</b> {member.FirstName} {member.MiddleName} {member.LastName}</div>
+                                                                            <div align="left"><b>Date of Birth:</b> {new Date(member.DOB).toLocaleDateString('en-US', dateOptions)}</div>
+                                                                        </CardBody>
+                                                                    </Card>
+                                                                </div>
+
+                                                            );
+                                                        }
+                                                    )}
                                                 </ModalBody>
                                                 <ModalFooter>
                                                     <Button color="danger" onClick={() => {

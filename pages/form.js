@@ -171,13 +171,32 @@ export default function Contact() {
             );
             let records = await add_res.json();
             addRecordSuccessValue = records.result[0].success;
+            let addRecordInsertIdValue = records.result[0].insertId;
+            console.log(` Adding household members: ${householdMembers}`);
+            for (let i = 0; i < householdMembers.length; i++) {
+
+                let household_add_res = await fetch(
+                    `/api/addHouseHoldMember?householdMemberApplicantId=${addRecordInsertIdValue}`
+                    + `&householdMemberDOB=${householdMembers[i].dob}`
+                    + `&householdMemberFirstName=${householdMembers[i].firstName}`
+                    + `&householdMemberLastName=${householdMembers[i].lastName}`
+                    + `&householdMemberMiddleName=${householdMembers[i].middleName}`
+                    ,
+                    {
+                        method: "POST",
+                        headers: {
+                            "accept": "application/json",
+                        },
+                    },
+                );
+                records = await household_add_res.json();
+                addRecordSuccessValue = addRecordSuccessValue && records.result[0].success;
+            }
+
         }
         setAddRecordSuccess(addRecordSuccessValue);
         handleOpen();
         console.log(`Submitted, Success: ${addRecordSuccessValue}`);
-
-        // window.alert("Form has been submitted, returning to home.");
-        // router.push('/');
 
     }
 
@@ -870,6 +889,7 @@ export default function Contact() {
                                     onClose={onClose}
                                     isDismissable={false}
                                     hideCloseButton={true}
+                                    className="py-4"
                                 >
                                     <ModalContent>
                                         {(onClose) => (
@@ -888,20 +908,13 @@ export default function Contact() {
                                                             </div>
                                                             <div align="left"><b>Requestor Email:</b> {session.user.email}</div>
                                                             <div align="left"><b>Request Date:</b> {new Date().toLocaleDateString('en-US', dateOptions)}</div>
+                                                            <Divider className="my-4" />
 
-
-                                                        </CardBody>
-                                                        <Divider />
-
-                                                        <CardBody >
                                                             <div align="left"><b>Full Name:</b> {formData.applicantFirstName} {formData.applicantMiddleName} {formData.applicantLastName}</div>
                                                             <div align="left"><b>Date of Birth:</b> {new Date(formData.applicantDOB).toLocaleDateString('en-US', dateOptions)}</div>
                                                             <div align="left"><b>Address:</b> {formData.applicantStreetAddress}, {formData.applicantPostalCode}. {formData.applicantCity}, {formData.applicantCountry}.
                                                             </div>
-                                                        </CardBody>
-                                                        <Divider />
-
-                                                        <CardBody fontSize={'1.15rem'}>
+                                                            <Divider className="my-4" />
                                                             <div align="left"><b>LRO Number:</b> {formData.lroNumber}</div>
                                                             <div align="left"><b>LRO Agency Name:</b> {formData.agencyName}</div>
                                                             <div align="left"><b>LRO Email:</b> {formData.lroEmail}</div>
@@ -918,15 +931,31 @@ export default function Contact() {
                                                             <div align="left"><b>LRO Monthly Electricity Amount</b> ${formData.monthlyElectricLRO}</div>
                                                             <div align="left"><b>Monthly Water Amount:</b> ${formData.monthlyWater}</div>
                                                             <div align="left"><b>LRO Monthly Water Amount:</b> ${formData.monthlyWaterLRO}</div>
-                                                        </CardBody>
-                                                        <Divider />
-
-                                                        <CardBody>
+                                                            <Divider className="my-4" />
                                                             <div align="left"><b>Funding Phase:</b> {formData.fundingPhase}</div>
                                                             <div align="left"><b>Jurisdiction:</b> {formData.jurisdiction}</div>
                                                             <div align="left"><b>Payment Vendor:</b> {formData.paymentVendor}</div>
                                                         </CardBody>
-                                                    </Card>
+                                                    </Card>{
+                                                        householdMembers.length > 0 && <p className='flex justify-center font-mono uppercase text-black text-center font-bold text-xl'>
+                                                            HouseHold Members
+                                                        </p>
+                                                    }
+                                                    {householdMembers.map(
+                                                        (member, index) => {
+                                                            return (
+                                                                <div key={index}>
+                                                                    <Card key={index}>
+                                                                        <CardBody>
+                                                                            <div align="left"><b>Full Name:</b> {member.firstName} {member.middleName} {member.lastName}</div>
+                                                                            <div align="left"><b>Date of Birth:</b> {new Date(member.dob).toLocaleDateString('en-US', dateOptions)}</div>
+                                                                        </CardBody>
+                                                                    </Card>
+                                                                </div>
+
+                                                            );
+                                                        }
+                                                    )}
                                                 </ModalBody>
                                                 <ModalFooter>
                                                     <Button color="danger" onClick={() => {

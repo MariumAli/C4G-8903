@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     try {
         const db_result = await executeQuery(
             {
-                query: "TRUNCATE TABLE Application_Applicant_LRO",
+                query: "TRUNCATE TABLE Application_Applicant_LRO"
             }
         );
 
@@ -15,6 +15,18 @@ export default async function handler(req, res) {
             } else {
                 res.status(200).json({ result: `No records found to be deleted.` })
             }
+
+            const member_db_result = await executeQuery(
+                {
+                    query: "TRUNCATE TABLE HouseholdMember"
+                }
+            );
+            if (member_db_result.affectedRows != 0) {
+                res.status(200).json({ result: `Removed all household records` })
+            } else {
+                res.status(200).json({ result: `No household records found to be deleted.` })
+            }
+
         } else {
             res.status(400).json({ result: "Error found in remote database response, refresh the page and try again." })
         }
