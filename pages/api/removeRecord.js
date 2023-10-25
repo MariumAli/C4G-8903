@@ -12,22 +12,20 @@ export default async function handler(req, res) {
             );
 
             if (db_result.hasOwnProperty("affectedRows")) {
-                if (db_result.affectedRows > 0) {
-                    res.status(200).json({ result: `Removed application record with ID: '${req.query.identity}'.` })
-                } else {
-                    res.status(200).json({ result: `No application records found with ID: '${req.query.identity}'.\n\nDatabase is unchanged.` })
-                }
+
                 const household_db_result = await executeQuery(
                     {
                         query: "DELETE FROM HouseholdMember WHERE `HouseholdMember`.`ApplicantId` = ?",
                         values: [req.query.identity]
                     }
                 );
-                if (household_db_result.affectedRows > 0) {
-                    res.status(200).json({ result: `Removed Household records for Applicant ID: '${req.query.identity}'.` })
+
+                if (db_result.affectedRows != 0 || household_db_result.affectedRows != 0) {
+                    res.status(200).json({ result: `Removed application record with ID: '${req.query.identity}'.` })
                 } else {
-                    res.status(200).json({ result: `No Household records found for Applicant ID: '${req.query.identity}'.\n\nDatabase is unchanged.` })
+                    res.status(200).json({ result: `No application records found with ID: '${req.query.identity}'.\n\nDatabase is unchanged.` })
                 }
+
             } else {
                 res.status(400).json({ result: "Error found in remote database response, refresh the page and try again." })
             }
