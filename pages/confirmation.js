@@ -14,17 +14,22 @@ export default function ConfirmationPage({ params }) {
 
     // will be used to populate the similar records HTML data below
     const [similarRecordsResponse, setSimilarRecordsResponse] = useState([]);
+    const [householdMemberSimilarApplicationRecords, setHouseholdMemberSimilarApplicationRecords] = useState([]);
     const [householdMemberSimilarRecords, setHouseholdMemberSimilarRecords] = useState([]);
+    const [memberSimilarRecords, setMemberSimilarRecords] = useState([]);
+
     const [confirmRejectPressed, setConfirmRejectPressed] = useState(false);
     const [applicationStatus, setApplicationStatus] = useState('');
     const [addRecordSuccess, setAddRecordSuccess] = useState(false);
     const [userRole, setUserRole] = useState("invalid");
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedApplicantHouseholdMembers, setSelectedApplicantHouseholdMembers] = React.useState([]);
+    const [selectedApplicantHouseholdMembers, setSelectedApplicantHouseholdMembers] = useState([]);
 
     const [formData, setFormData] = useState({
         statusComments: "",
     });
+
+    const [statusComments, setStatusComments] = useState("");
 
     useEffect(
         () => {
@@ -57,22 +62,24 @@ export default function ConfirmationPage({ params }) {
     React.useEffect(
         () => {
             async function getHouseHoldMembers() {
-                console.log("Lets get household member info for applicant: ");
-                console.log(data);
-                let res_household_members = await fetch(
-                    `/api/getHouseHoldMembers?applicantId=${data.ApplicationId}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "accept": "application/json",
+                if (Object.keys(data).length > 0) {
+                    // console.log("Lets get household member info for applicant: ");
+                    // console.log(data);
+                    let res_household_members = await fetch(
+                        `/api/getHouseHoldMembers?applicantId=${data.ApplicationId}`,
+                        {
+                            method: "GET",
+                            headers: {
+                                "accept": "application/json",
+                            },
                         },
-                    },
-                );
-                let household_members = await res_household_members.json();
+                    );
+                    let household_members = await res_household_members.json();
 
-                console.log("Setting HouseHold Members for selected applicant");
-                console.log(household_members);
-                setSelectedApplicantHouseholdMembers(household_members.result);
+                    console.log("Setting HouseHold Members for selected applicant");
+                    console.log(household_members);
+                    setSelectedApplicantHouseholdMembers(household_members.result);
+                }
             }
             getHouseHoldMembers();
         },
@@ -82,9 +89,9 @@ export default function ConfirmationPage({ params }) {
     useEffect(
         () => {
             async function getSimilarRecords() {
-                if (router.isReady) {
+                if (router.isReady && Object.keys(data).length > 0 && Object.keys(selectedApplicantHouseholdMembers).length > 0) {
                     let records_res = await fetch(
-                        `/api/gatherSimilarRecords?dob=${data.DOB}&firstname=${data.FirstName}&lastname=${data.LastName}`,
+                        `/api/gatherSimilarRecords?dob=${data.DOB}&firstname=${data.FirstName}&lastname=${data.LastName}&applicationId=${data.ApplicationId}`,
                         {
                             method: "GET",
                             headers: {
@@ -96,33 +103,21 @@ export default function ConfirmationPage({ params }) {
 
                     console.log("Setting Similar Records");
                     // console.log(records);
-                    setSimilarRecordsResponse(records.result);
+                    setSimilarRecordsResponse(records.result.similarRecords);
+                    setHouseholdMemberSimilarRecords(records.result.memberSimilarRecords)
+
+                    // console.log("setSimilarRecordsResponse: ", similarRecordsResponse);
+                    // console.log("setHouseholdMemberSimilarRecords: ", householdMemberSimilarRecords);
 
                     // parse out household members from query parameters
-                    let members = {};
-                    for (let key in data) {
-                        if (key.startsWith("householdMember")) {
-                            let elements = key.split("_");
-                            if (elements.length != 3) {
-                                continue;
-                            }
-                            let memberIndex = elements[1];
-                            let fieldKey = elements[2];
-                            let fieldVal = data[key];
-
-                            if (!members.hasOwnProperty(memberIndex)) {
-                                members[memberIndex] = {};
-                            }
-                            members[memberIndex][fieldKey] = fieldVal;
-                        }
-                    }
 
                     var newHouseholdMemberSimilarRecords = {};
-                    for (let key in members) {
-                        let member = members[key];
+                    var memberSimilarRecords = {};
+                    for (let key in selectedApplicantHouseholdMembers) {
+                        let member = selectedApplicantHouseholdMembers[key];
                         console.log("MEMBER: ", member);
                         var member_records_res = await fetch(
-                            `/api/gatherSimilarRecords?dob=${member.dob}&firstname=${member.firstName}&lastname=${member.lastName}`,
+                            `/api/gatherSimilarRecords?dob=${member.DOB}&firstname=${member.FirstName}&lastname=${member.LastName}&applicationId=${data.ApplicationId}`,
                             {
                                 method: "GET",
                                 headers: {
@@ -131,21 +126,49 @@ export default function ConfirmationPage({ params }) {
                             },
                         );
                         var member_records = await member_records_res.json();
-                        for (let k in member_records.result) {
-                            newHouseholdMemberSimilarRecords[k] = member_records.result[k];
+
+                        console.log('member_records');
+                        console.log(member_records);
+                        // console.log(member_records.result.similarRecords);
+                        // console.log(member_records.result.memberSimilarRecords);
+
+                        for (let [key, value] of Object.entries(member_records.result.similarRecords)) {
+                            // console.log('similarRecords key: ', key);
+                            // console.log('similarRecords value: ', value);
+                            if (!newHouseholdMemberSimilarRecords.hasOwnProperty(key) && value.history[0].identity != data.ApplicationId) {
+                                newHouseholdMemberSimilarRecords[key] = value;
+                            }
                         }
+
+                        for (let [key, value] of Object.entries(member_records.result.memberSimilarRecords)) {
+                            // console.log('memberSimilarRecords key: ', key);
+                            // console.log('memberSimilarRecords value: ', value);
+                            // console.log('data.ApplicationId', data.ApplicationId);
+                            // console.log('value.history.ApplicantId', value.history[0].ApplicantId);
+                            if (!memberSimilarRecords.hasOwnProperty(key) && value.history[0].ApplicantId != data.ApplicationId) {
+                                memberSimilarRecords[key] = value;
+                            }
+                        }
+
+                        // newHouseholdMemberSimilarRecords = Object.assign(newHouseholdMemberSimilarRecords, member_records.result['similarRecords']);
+                        // memberSimilarRecords = Object.assign(memberSimilarRecords, member_records.result['memberSimilarRecords']);
+
                     }
 
                     console.log("Household Member Records: ", newHouseholdMemberSimilarRecords);
-                    setHouseholdMemberSimilarRecords(newHouseholdMemberSimilarRecords);
+                    console.log("Member Records: ", memberSimilarRecords);
+                    setHouseholdMemberSimilarApplicationRecords(newHouseholdMemberSimilarRecords);
+                    setMemberSimilarRecords(memberSimilarRecords);
                 } else {
                     setSimilarRecordsResponse([]);
+                    setHouseholdMemberSimilarApplicationRecords([]);
                     setHouseholdMemberSimilarRecords([]);
+                    setMemberSimilarRecords([]);
                 }
             }
             getSimilarRecords();
         },
-        [router.isReady, data]
+        [router.isReady, data, selectedApplicantHouseholdMembers]
     );
 
     const processApprove = () => {
@@ -171,7 +194,7 @@ export default function ConfirmationPage({ params }) {
             let add_res = await fetch(
                 `/api/updateApplicationStatus?`
                 + `status=Approved`
-                + `&statusComments=${data.statusComments}`
+                + `&statusComments=${statusComments}`
                 + `&applicationId=${data.ApplicationId}`
                 ,
                 {
@@ -206,7 +229,7 @@ export default function ConfirmationPage({ params }) {
             let add_res = await fetch(
                 `/api/updateApplicationStatus?`
                 + `status=Rejected`
-                + `&statusComments=${data.statusComments}`
+                + `&statusComments=${statusComments}`
                 + `&applicationId=${data.ApplicationId}`
                 ,
                 {
@@ -220,9 +243,7 @@ export default function ConfirmationPage({ params }) {
             addRecordSuccessValue = records.result[0].success;
         }
 
-        setConfirmRejectPressed(true);
-        setApplicationStatus("Rejected");
-        addApplication("Rejected");
+        // addApplication("Rejected");
 
         // trigger email notification
         let res = await fetch(
@@ -232,6 +253,9 @@ export default function ConfirmationPage({ params }) {
                 query: data
             },
         );
+
+        setApplicationStatus("Rejected");
+        setConfirmRejectPressed(true);
 
         window.alert("Request has been processed, returning to home.");
         router.push('/');
@@ -243,7 +267,7 @@ export default function ConfirmationPage({ params }) {
             let add_res = await fetch(
                 `/api/updateApplicationStatus?`
                 + `status=Pending - Agent Action`
-                + `&statusComments=${data.statusComments}`
+                + `&statusComments=${statusComments}`
                 + `&applicationId=${data.ApplicationId}`
                 ,
                 {
@@ -257,9 +281,7 @@ export default function ConfirmationPage({ params }) {
             addRecordSuccessValue = records.result[0].success;
         }
 
-        setConfirmRejectPressed(true);
-        setApplicationStatus("Pending");
-        addApplication("Pending - Agent Action");
+        // addApplication("Pending - Agent Action");
 
         // trigger email notification
         let res = await fetch(
@@ -270,6 +292,9 @@ export default function ConfirmationPage({ params }) {
             },
         );
 
+        setApplicationStatus("Pending");
+        setConfirmRejectPressed(true);
+        
         window.alert("Request has been processed, returning to home.");
         router.push('/');
     }
@@ -444,36 +469,34 @@ export default function ConfirmationPage({ params }) {
                                         {history.map(
                                             (application) => {
                                                 return (
-                                                    <div key={application.identity}>
-                                                        <Card key={application.identity} >
-                                                            <CardBody>
-                                                                <div align="left"><b>Full Name:</b> {name}</div>
-                                                                <div align="left"><b>Date of Birth:</b> {dob}</div>
-                                                                <div align="left"><b>Request Date:</b> {data.date}</div>
-                                                                <Divider />
-                                                                <div align="left"><b>LRO Number:</b> {application.lroNumber}</div>
-                                                                <div align="left"><b>LRO Agency Name:</b> {application.agency}</div>
-                                                                <div align="left"><b>LRO Email:</b> {application.lroEmail}</div>
-                                                                <div align="left"><b>Monthly Rent Amount:</b> ${application.rent}</div>
-                                                                <div align="left"><b>LRO Monthly Rent Amount:</b> ${application.rentLRO}</div>
-                                                                <div align="left"><b>Monthly Mortgage Amount:</b> ${application.mortgage}</div>
-                                                                <div align="left"><b>LRO Monthly Mortgage Amount:</b> ${application.mortgageLRO}</div>
-                                                                <div align="left"><b>Lodging Cost/Night:</b> ${application.lodgingCost}</div>
-                                                                <div align="left"><b>Lodging Night Count:</b> ${application.lodgingCount}</div>
-                                                                <div align="left"><b>LRO Lodging Cost/Night:</b> ${application.lodgingCostLRO}</div>
-                                                                <div align="left"><b>Monthly Gas Amount:</b> ${application.gas}</div>
-                                                                <div align="left"><b>LRO Monthly Gas Amount:</b> ${application.gasLRO}</div>
-                                                                <div align="left"><b>Monthly Electricity Amount:</b> ${application.electric}</div>
-                                                                <div align="left"><b>LRO Monthly Electricity Amount</b> ${application.electricLRO}</div>
-                                                                <div align="left"><b>Monthly Water Amount:</b> ${application.water}</div>
-                                                                <div align="left"><b>LRO Monthly Water Amount:</b> ${application.waterLRO}</div>
-                                                                <Divider />
-                                                                <div align="left"><b>Funding Phase:</b> {formData.fundingPhase}</div>
-                                                                <div align="left"><b>Jurisdiction:</b> {formData.jurisdiction}</div>
-                                                                <div align="left"><b>Payment Vendor:</b> {formData.paymentVendor}</div>
-                                                            </CardBody>
-                                                        </Card>
-                                                    </div>
+                                                    <Card key={application.identity} >
+                                                        <CardBody>
+                                                            <div align="left"><b>Full Name:</b> {name}</div>
+                                                            <div align="left"><b>Date of Birth:</b> {dob}</div>
+                                                            <div align="left"><b>Request Date:</b> {data.date}</div>
+                                                            <Divider />
+                                                            <div align="left"><b>LRO Number:</b> {application.lroNumber}</div>
+                                                            <div align="left"><b>LRO Agency Name:</b> {application.agency}</div>
+                                                            <div align="left"><b>LRO Email:</b> {application.lroEmail}</div>
+                                                            <div align="left"><b>Monthly Rent Amount:</b> ${application.rent}</div>
+                                                            <div align="left"><b>LRO Monthly Rent Amount:</b> ${application.rentLRO}</div>
+                                                            <div align="left"><b>Monthly Mortgage Amount:</b> ${application.mortgage}</div>
+                                                            <div align="left"><b>LRO Monthly Mortgage Amount:</b> ${application.mortgageLRO}</div>
+                                                            <div align="left"><b>Lodging Cost/Night:</b> ${application.lodgingCost}</div>
+                                                            <div align="left"><b>Lodging Night Count:</b> ${application.lodgingCount}</div>
+                                                            <div align="left"><b>LRO Lodging Cost/Night:</b> ${application.lodgingCostLRO}</div>
+                                                            <div align="left"><b>Monthly Gas Amount:</b> ${application.gas}</div>
+                                                            <div align="left"><b>LRO Monthly Gas Amount:</b> ${application.gasLRO}</div>
+                                                            <div align="left"><b>Monthly Electricity Amount:</b> ${application.electric}</div>
+                                                            <div align="left"><b>LRO Monthly Electricity Amount</b> ${application.electricLRO}</div>
+                                                            <div align="left"><b>Monthly Water Amount:</b> ${application.water}</div>
+                                                            <div align="left"><b>LRO Monthly Water Amount:</b> ${application.waterLRO}</div>
+                                                            <Divider />
+                                                            <div align="left"><b>Funding Phase:</b> {application.fundingPhase}</div>
+                                                            <div align="left"><b>Jurisdiction:</b> {application.jurisdiction}</div>
+                                                            <div align="left"><b>Payment Vendor:</b> {application.paymentVendor}</div>
+                                                        </CardBody>
+                                                    </Card>
 
                                                 );
                                             }
@@ -483,57 +506,44 @@ export default function ConfirmationPage({ params }) {
                             }
                         )}
 
-                    </div>
-
-                    <div className="flex flex-col flex-nowrap text-base mt-10">
-                        <p className="flex font-mono justify-center uppercase text-black text-center font-bold items-center text-4xl">
-                            Existing Similar Records of Household Members
-                        </p>
-                        <p className="flex font-mono text-black justify-center text-center items-center text-xl mt-7 mb-7">
-                            The following information shows previously approved funding records for applicants that have been detected to be similar to household members of the current pending applicant. Take a look at these to ensure there is no duplication of information or resources before confirming the request.
-                        </p>
-
-
-                        {Object.keys(householdMemberSimilarRecords).map(
+                        {Object.keys(householdMemberSimilarApplicationRecords).map(
                             (name) => {
-                                let dob = householdMemberSimilarRecords[name].dob;
-                                let history = householdMemberSimilarRecords[name].history;
+                                let dob = householdMemberSimilarApplicationRecords[name].dob;
+                                let history = householdMemberSimilarApplicationRecords[name].history;
                                 console.log(`Found Similar Applicant: ${name} (DOB: ${dob})`);
                                 return (
                                     <div key={name} className="grid grid-cols-3 gap-3 px-10">
                                         {history.map(
                                             (application) => {
                                                 return (
-                                                    <div key={application.identity}>
-                                                        <Card key={application.identity} >
-                                                            <CardBody>
-                                                                <div align="left"><b>Full Name:</b> {name}</div>
-                                                                <div align="left"><b>Date of Birth:</b> {dob}</div>
-                                                                <div align="left"><b>Request Date:</b> {data.date}</div>
-                                                                <Divider />
-                                                                <div align="left"><b>LRO Number:</b> {application.lroNumber}</div>
-                                                                <div align="left"><b>LRO Agency Name:</b> {application.agency}</div>
-                                                                <div align="left"><b>LRO Email:</b> {application.lroEmail}</div>
-                                                                <div align="left"><b>Monthly Rent Amount:</b> ${application.rent}</div>
-                                                                <div align="left"><b>LRO Monthly Rent Amount:</b> ${application.rentLRO}</div>
-                                                                <div align="left"><b>Monthly Mortgage Amount:</b> ${application.mortgage}</div>
-                                                                <div align="left"><b>LRO Monthly Mortgage Amount:</b> ${application.mortgageLRO}</div>
-                                                                <div align="left"><b>Lodging Cost/Night:</b> ${application.lodgingCost}</div>
-                                                                <div align="left"><b>Lodging Night Count:</b> ${application.lodgingCount}</div>
-                                                                <div align="left"><b>LRO Lodging Cost/Night:</b> ${application.lodgingCostLRO}</div>
-                                                                <div align="left"><b>Monthly Gas Amount:</b> ${application.gas}</div>
-                                                                <div align="left"><b>LRO Monthly Gas Amount:</b> ${application.gasLRO}</div>
-                                                                <div align="left"><b>Monthly Electricity Amount:</b> ${application.electric}</div>
-                                                                <div align="left"><b>LRO Monthly Electricity Amount</b> ${application.electricLRO}</div>
-                                                                <div align="left"><b>Monthly Water Amount:</b> ${application.water}</div>
-                                                                <div align="left"><b>LRO Monthly Water Amount:</b> ${application.waterLRO}</div>
-                                                                <Divider />
-                                                                <div align="left"><b>Funding Phase:</b> {application.fundingPhase}</div>
-                                                                <div align="left"><b>Jurisdiction:</b> {application.jurisdiction}</div>
-                                                                <div align="left"><b>Payment Vendor:</b> {application.paymentVendor}</div>
-                                                            </CardBody>
-                                                        </Card>
-                                                    </div>
+                                                    <Card key={application.identity} >
+                                                        <CardBody>
+                                                            <div align="left"><b>Full Name:</b> {name}</div>
+                                                            <div align="left"><b>Date of Birth:</b> {dob}</div>
+                                                            <div align="left"><b>Request Date:</b> {data.date}</div>
+                                                            <Divider />
+                                                            <div align="left"><b>LRO Number:</b> {application.lroNumber}</div>
+                                                            <div align="left"><b>LRO Agency Name:</b> {application.agency}</div>
+                                                            <div align="left"><b>LRO Email:</b> {application.lroEmail}</div>
+                                                            <div align="left"><b>Monthly Rent Amount:</b> ${application.rent}</div>
+                                                            <div align="left"><b>LRO Monthly Rent Amount:</b> ${application.rentLRO}</div>
+                                                            <div align="left"><b>Monthly Mortgage Amount:</b> ${application.mortgage}</div>
+                                                            <div align="left"><b>LRO Monthly Mortgage Amount:</b> ${application.mortgageLRO}</div>
+                                                            <div align="left"><b>Lodging Cost/Night:</b> ${application.lodgingCost}</div>
+                                                            <div align="left"><b>Lodging Night Count:</b> ${application.lodgingCount}</div>
+                                                            <div align="left"><b>LRO Lodging Cost/Night:</b> ${application.lodgingCostLRO}</div>
+                                                            <div align="left"><b>Monthly Gas Amount:</b> ${application.gas}</div>
+                                                            <div align="left"><b>LRO Monthly Gas Amount:</b> ${application.gasLRO}</div>
+                                                            <div align="left"><b>Monthly Electricity Amount:</b> ${application.electric}</div>
+                                                            <div align="left"><b>LRO Monthly Electricity Amount</b> ${application.electricLRO}</div>
+                                                            <div align="left"><b>Monthly Water Amount:</b> ${application.water}</div>
+                                                            <div align="left"><b>LRO Monthly Water Amount:</b> ${application.waterLRO}</div>
+                                                            <Divider />
+                                                            <div align="left"><b>Funding Phase:</b> {application.fundingPhase}</div>
+                                                            <div align="left"><b>Jurisdiction:</b> {application.jurisdiction}</div>
+                                                            <div align="left"><b>Payment Vendor:</b> {application.paymentVendor}</div>
+                                                        </CardBody>
+                                                    </Card>
 
                                                 );
                                             }
@@ -542,12 +552,73 @@ export default function ConfirmationPage({ params }) {
                                 );
                             }
                         )}
+                    </div>
 
+                    <div className="flex flex-col flex-nowrap text-base mt-10">
+                        <p className="flex font-mono justify-center uppercase text-black text-center font-bold items-center text-4xl">
+                            Existing Similar HouseHold Member Records
+                        </p>
+                        <div className="grid grid-cols-3 gap-3 px-10">
+                            {Object.keys(householdMemberSimilarRecords).map(
+                                (name) => {
+                                    let dob = householdMemberSimilarRecords[name].dob;
+                                    let history = householdMemberSimilarRecords[name].history;
+                                    // console.log(`Found Similar Household Member Applicant: ${name} (DOB: ${dob})`);
+                                    return (history.map(
+                                        (member) => {
+                                            return (
+                                                <Card key={member.identity} >
+                                                    <CardBody>
+                                                        <div align="left"><b>AppllicantId:</b> {member.ApplicantId}</div>
+                                                        <Divider />
+                                                        <div align="left"><b>Full Name:</b> {name}</div>
+                                                        <div align="left"><b>Date of Birth:</b> {dob}</div>
+                                                    </CardBody>
+                                                </Card>
+
+                                            );
+                                        }
+                                    )
+
+                                    );
+                                }
+                            )}
+
+                            {Object.keys(memberSimilarRecords).map(
+                                (name) => {
+                                    let dob = memberSimilarRecords[name].dob;
+                                    let history = memberSimilarRecords[name].history;
+                                    // console.log(`Found Similar Household Member Applicant: ${name} (DOB: ${dob})`);
+                                    return (
+                                        history.map(
+                                            (member) => {
+                                                return (
+                                                    <Card key={member.identity} >
+                                                        <CardBody>
+                                                            <div align="left"><b>ApplicantId:</b> {member.ApplicantId}</div>
+                                                            <Divider />
+                                                            <div align="left"><b>Full Name:</b> {name}</div>
+                                                            <div align="left"><b>Date of Birth:</b> {dob}</div>
+                                                        </CardBody>
+                                                    </Card>
+
+                                                );
+                                            }
+                                        )
+
+                                    );
+                                }
+                            )}
+
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col flex-nowrap text-base mt-10">
                         <Textarea
                             label="Comments"
                             variant="bordered"
-                            value={data.statusComments}
-                            onChange={handleInput}
+                            value={statusComments}
+                            onValueChange={setStatusComments}
                             labelPlacement="outside"
                             placeholder="Enter comments in regards to status for future reference"
                             className="font-mono text-black text-left text-xl px"

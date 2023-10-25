@@ -419,8 +419,8 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                 classNames={{
                     wrapper: "max-h-[1200px] max-w-full	min-w-full",
                 }}
-                selectedKeys={selectedKeys}
-                selectionMode="multiple"
+                // selectedKeys={selectedKeys}
+                // selectionMode="multiple"
                 sortDescriptor={sortDescriptor}
                 topContent={topContent}
                 topContentPlacement="outside"
