@@ -177,6 +177,18 @@ export default function ConfirmationPage({ params }) {
         addApplication("Approved");
     }
 
+    const processReject = () => {
+        setConfirmRejectPressed(true);
+        setApplicationStatus("Rejected");
+        addApplication("Rejected");
+    }
+
+    const processFurtherInfo = () => {
+        setConfirmRejectPressed(true);
+        setApplicationStatus("Pending - Agent Action");
+        addApplication("Pending - Agent Action");
+    }
+
     const handleInput = (e) => {
         const fieldName = e.target.name;
         const fieldValue = e.target.value;
@@ -187,7 +199,6 @@ export default function ConfirmationPage({ params }) {
         }));
     }
 
-    // TODO: add an alert when a request is approved
     async function addApplication(appStatus) {
         var addRecordSuccessValue = false;
         if (router.isReady) {
@@ -219,82 +230,6 @@ export default function ConfirmationPage({ params }) {
             },
         );
 
-        window.alert("Request has been processed, returning to home.");
-        router.push('/');
-    }
-
-    async function processReject() {
-        var addRecordSuccessValue = false;
-        if (router.isReady) {
-            let add_res = await fetch(
-                `/api/updateApplicationStatus?`
-                + `status=Rejected`
-                + `&statusComments=${statusComments}`
-                + `&applicationId=${data.ApplicationId}`
-                ,
-                {
-                    method: "POST",
-                    headers: {
-                        "accept": "application/json",
-                    },
-                },
-            );
-            let records = await add_res.json();
-            addRecordSuccessValue = records.result[0].success;
-        }
-
-        // addApplication("Rejected");
-
-        // trigger email notification
-        let res = await fetch(
-            `/api/mailAgent`,
-            {
-                method: "POST",
-                query: data
-            },
-        );
-
-        setApplicationStatus("Rejected");
-        setConfirmRejectPressed(true);
-
-        window.alert("Request has been processed, returning to home.");
-        router.push('/');
-    }
-
-    async function processFurtherInfo() {
-        var addRecordSuccessValue = false;
-        if (router.isReady) {
-            let add_res = await fetch(
-                `/api/updateApplicationStatus?`
-                + `status=Pending - Agent Action`
-                + `&statusComments=${statusComments}`
-                + `&applicationId=${data.ApplicationId}`
-                ,
-                {
-                    method: "POST",
-                    headers: {
-                        "accept": "application/json",
-                    },
-                },
-            );
-            let records = await add_res.json();
-            addRecordSuccessValue = records.result[0].success;
-        }
-
-        // addApplication("Pending - Agent Action");
-
-        // trigger email notification
-        let res = await fetch(
-            `/api/mailAgent`,
-            {
-                method: "POST",
-                query: data
-            },
-        );
-
-        setApplicationStatus("Pending");
-        setConfirmRejectPressed(true);
-        
         window.alert("Request has been processed, returning to home.");
         router.push('/');
     }
