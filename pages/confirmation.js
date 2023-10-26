@@ -204,7 +204,7 @@ export default function ConfirmationPage({ params }) {
         if (router.isReady) {
             let add_res = await fetch(
                 `/api/updateApplicationStatus?`
-                + `status=Approved`
+                + `status=${appStatus}`
                 + `&statusComments=${statusComments}`
                 + `&applicationId=${data.ApplicationId}`
                 ,
