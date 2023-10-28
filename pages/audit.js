@@ -6,7 +6,7 @@ import { columns, initialVisibleColumns } from "@/data";
 import { Button, CircularProgress } from "@nextui-org/react";
 import { CSVLink } from "react-csv";
 import { Card, CardHeader, CardBody, Divider } from "@nextui-org/react";
-import Alert from '@mui/material/Alert';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 
 
 export default function Audit({ params }) {
@@ -16,6 +16,8 @@ export default function Audit({ params }) {
     const [allRecordsWithHouseholdMembers, setAllRecordsWithHouseholdMembers] = useState([]);
     const [userRole, setUserRole] = useState("invalid");
     const [isLoading, setIsLoading] = useState(true);
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const [modalText, setModalText] = useState("");
 
 
     useEffect(
@@ -161,8 +163,14 @@ export default function Audit({ params }) {
         );
         let res_json = await res.json();
         console.log(`remove record call response status: ${res.status}`);
-        alert(res_json.result);
+        // alert(res_json.result);
 
+        setModalText(`Removed Application Record ${res_json.result}`);
+        onOpen();
+    }
+
+    const onModalClose = () => {
+        onClose()
         window.location.reload();
     }
 
@@ -221,7 +229,7 @@ export default function Audit({ params }) {
             }}>
                 <Card>
                     <CardHeader>
-                        <p className="flex font-mono font-medium text-xl mt-10">
+                        <p className="flex font-mono font-medium text-lg mt-10">
                             Page Requires Authentication
                         </p>
                     </CardHeader>
@@ -290,51 +298,68 @@ export default function Audit({ params }) {
         )
     } else {
         return (userRole ? (
-            <div className="flex w-full flex-col flex-nowrap items-center text-base ">
-                <p className="flex font-mono font-medium text-6xl mt-10 mb-12"></p>
+            <><Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} hideCloseButton={true}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Successfull</ModalHeader>
+                            <ModalBody>
+                                <p>
+                                    {modalText}
+                                </p>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={onModalClose}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal><div className="flex w-full flex-col flex-nowrap items-center text-base ">
+                    <p className="flex font-mono font-medium text-6xl mt-10 mb-12"></p>
 
-                <div className="flex flex-col flex-nowrap mt-15 items-center">
-                    <ResponsiveRecordsTable allRecords={allRecords}
-                        onUpdate={updateApplicationStatus}
-                        onDelete={deleteApplication}
-                        onEdit={editApplication}
-                        columns={columns}
-                        initialVisibleColumns={initialVisibleColumns}
-                        userRole={userRole} />
-
-                </div>
-                {userRole == "admin" ? (
-                    <div className="flex flex-row w-full space-y-4 flex-nowrap items-center mt-15">
-                        <div className="flex text-base w-full space-y-4 flex-wrap flex-col items-center mt-10 pb-10">
-                            <p className="flex font-mono font-medium text-base">Export Records</p>
-                            <p className="flex font-mono font-medium text-sm">
-                                {"Exports all Records to an Excel file"}
-                            </p>
-                            {/* Export Button Start */}
-                            <Button color="primary">
-                                <CSVLink id="download-records-form" filename={`records-${new Date().toDateString()}.csv`}
-                                    data={allRecordsWithHouseholdMembers}>
-                                    Export Records to CSV
-                                </CSVLink>
-                            </Button>
-                        </div>
-
-                        <div className="flex text-base w-full space-y-4 flex-wrap flex-col items-center mt-10 pb-10">
-                            <p className="flex font-mono font-medium text-base">Delete All Records</p>
-                            <p className="flex font-mono font-medium text-sm">
-                                {"Deletes all Records and resets the Database"}
-                            </p>
-                            <Button color="danger" onClick={(e) => submitDeleteAllRecords(e)}>
-                                Delete All Records
-                            </Button>
-
-                        </div>
+                    <div className="flex flex-col flex-nowrap mt-15 items-center">
+                        <ResponsiveRecordsTable allRecords={allRecords}
+                            onUpdate={updateApplicationStatus}
+                            onDelete={deleteApplication}
+                            onEdit={editApplication}
+                            columns={columns}
+                            initialVisibleColumns={initialVisibleColumns}
+                            userRole={userRole} />
 
                     </div>
-                )
-                    : ''
-                }
-            </div>
+                    {userRole == "admin" ? (
+                        <div className="flex flex-row w-full space-y-4 flex-nowrap items-center mt-15">
+                            <div className="flex text-base w-full space-y-4 flex-wrap flex-col items-center mt-10 pb-10">
+                                <p className="flex font-mono font-medium text-base">Export Records</p>
+                                <p className="flex font-mono font-medium text-sm">
+                                    {"Exports all Records to an Excel file"}
+                                </p>
+                                {/* Export Button Start */}
+                                <Button color="primary">
+                                    <CSVLink id="download-records-form" filename={`records-${new Date().toDateString()}.csv`}
+                                        data={allRecordsWithHouseholdMembers}>
+                                        Export Records to CSV
+                                    </CSVLink>
+                                </Button>
+                            </div>
+
+                            <div className="flex text-base w-full space-y-4 flex-wrap flex-col items-center mt-10 pb-10">
+                                <p className="flex font-mono font-medium text-base">Delete All Records</p>
+                                <p className="flex font-mono font-medium text-sm">
+                                    {"Deletes all Records and resets the Database"}
+                                </p>
+                                <Button color="danger" onClick={(e) => submitDeleteAllRecords(e)}>
+                                    Delete All Records
+                                </Button>
+
+                            </div>
+
+                        </div>
+                    )
+                        : ''}
+                </div></>
         ) : ''
         );
     }
