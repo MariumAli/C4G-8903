@@ -28,6 +28,7 @@ import { columns, statusOptions, initialVisibleColumns, statusColorMap, dateOpti
 import { capitalize } from "@/utils";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import Alert from '@mui/material/Alert';
 
 
 
@@ -37,7 +38,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(initialVisibleColumns));
     const [statusFilter, setStatusFilter] = React.useState("all");
-    const [rowsPerPage, setRowsPerPage] = React.useState(15);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [openedRow, setOpenedRow] = React.useState(null);
     const [selectedApplicantHouseholdMembers, setSelectedApplicantHouseholdMembers] = React.useState([]);
     const [sortDescriptor, setSortDescriptor] = React.useState({
@@ -276,7 +277,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
 
     const topContent = React.useMemo(() => {
         return (
-            <div className="flex flex-col gap-4">
+            <><div className="flex flex-col gap-4">
                 <div className="flex justify-between gap-3 items-end">
                     <Input
                         isClearable
@@ -285,8 +286,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                         startContent={<SearchIcon />}
                         value={filterValue}
                         onClear={() => onClear()}
-                        onValueChange={onSearchChange}
-                    />
+                        onValueChange={onSearchChange} />
                     <Input
                         isClearable
                         className="w-full sm:max-w-[40%]"
@@ -294,8 +294,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                         startContent={<SearchIcon />}
                         value={filterEmailValue}
                         onClear={() => onEmailClear()}
-                        onValueChange={onEmailSearchChange}
-                    />
+                        onValueChange={onEmailSearchChange} />
                     <div className="flex gap-3">
                         <Dropdown>
                             <Tooltip showArrow={true} content="Use this Status Dropdown to Filter Pending Requests">
@@ -360,6 +359,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                             className="bg-transparent outline-none text-default-400 text-small"
                             onChange={onRowsPerPageChange}
                         >
+                            <option value="10">5</option>
                             <option value="10">10</option>
                             <option value="15">15</option>
                             <option value="20">25</option>
@@ -367,6 +367,10 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                     </label>
                 </div>
             </div>
+                <div>
+                    <Alert severity="info" className="container px-15">Please use the Status filter to filter <b>Pending</b> records</Alert>
+                </div>
+            </>
         );
     }, [
         filterValue,
@@ -413,6 +417,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
 
     return (
         <div className="max-w-full min-w-full">
+
             <Table
                 aria-label="All Records"
                 isHeaderSticky
