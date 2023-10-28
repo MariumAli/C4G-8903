@@ -6,6 +6,7 @@ import { columns, initialVisibleColumns } from "@/data";
 import { Button, CircularProgress } from "@nextui-org/react";
 import { CSVLink } from "react-csv";
 import { Card, CardHeader, CardBody, Divider } from "@nextui-org/react";
+import Alert from '@mui/material/Alert';
 
 
 export default function Audit({ params }) {
@@ -291,6 +292,7 @@ export default function Audit({ params }) {
         return (userRole ? (
             <div className="flex w-full flex-col flex-nowrap items-center text-base ">
                 <p className="flex font-mono font-medium text-6xl mt-10 mb-12"></p>
+
                 <div className="flex flex-col flex-nowrap mt-15 items-center">
                     <ResponsiveRecordsTable allRecords={allRecords}
                         onUpdate={updateApplicationStatus}

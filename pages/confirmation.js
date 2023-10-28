@@ -92,7 +92,7 @@ export default function ConfirmationPage({ params }) {
     useEffect(
         () => {
             async function getSimilarRecords() {
-                if (router.isReady && Object.keys(data).length > 0 && Object.keys(selectedApplicantHouseholdMembers).length > 0) {
+                if (router.isReady && Object.keys(data).length > 0) {
                     let records_res = await fetch(
                         `/api/gatherSimilarRecords?dob=${data.DOB}&firstname=${data.FirstName}&lastname=${data.LastName}&applicationId=${data.ApplicationId}`,
                         {
@@ -109,11 +109,24 @@ export default function ConfirmationPage({ params }) {
                     setSimilarRecordsResponse(records.result.similarRecords);
                     setHouseholdMemberSimilarRecords(records.result.memberSimilarRecords)
 
-                    // console.log("setSimilarRecordsResponse: ", similarRecordsResponse);
-                    // console.log("setHouseholdMemberSimilarRecords: ", householdMemberSimilarRecords);
+                    console.log("setSimilarRecordsResponse: ", similarRecordsResponse);
+                    console.log("setHouseholdMemberSimilarRecords: ", householdMemberSimilarRecords);
 
-                    // parse out household members from query parameters
 
+                } else {
+                    setSimilarRecordsResponse([]);
+                    setHouseholdMemberSimilarApplicationRecords([]);
+                }
+            }
+            getSimilarRecords();
+        },
+        [router.isReady, data]
+    );
+
+    useEffect(
+        () => {
+            async function getSimilarRecordsForMembers() {
+                if (router.isReady && Object.keys(selectedApplicantHouseholdMembers).length > 0) {
                     var newHouseholdMemberSimilarRecords = {};
                     var memberSimilarRecords = {};
                     for (let key in selectedApplicantHouseholdMembers) {
@@ -163,15 +176,13 @@ export default function ConfirmationPage({ params }) {
                     setHouseholdMemberSimilarApplicationRecords(newHouseholdMemberSimilarRecords);
                     setMemberSimilarRecords(memberSimilarRecords);
                 } else {
-                    setSimilarRecordsResponse([]);
-                    setHouseholdMemberSimilarApplicationRecords([]);
                     setHouseholdMemberSimilarRecords([]);
                     setMemberSimilarRecords([]);
                 }
             }
-            getSimilarRecords();
+            getSimilarRecordsForMembers();
         },
-        [router.isReady, data, selectedApplicantHouseholdMembers]
+        [router.isReady, selectedApplicantHouseholdMembers]
     );
     const onModalClose = () => {
         onClose()
@@ -577,14 +588,15 @@ export default function ConfirmationPage({ params }) {
                 </div>
 
                 <div className="flex flex-col flex-nowrap text-base mt-10">
-                    <Textarea
-                        label="Comments"
-                        variant="bordered"
-                        value={statusComments}
-                        onValueChange={setStatusComments}
-                        labelPlacement="outside"
-                        placeholder="Enter comments in regards to status for future reference"
-                        className="font-mono text-black text-left text-xl px" />
+                    <div className='text-black text-left text-xl px-10'>
+                        <p className='text-left align-left'> Comments</p>
+                        <Textarea
+                            variant="bordered"
+                            value={statusComments}
+                            onValueChange={setStatusComments}
+                            placeholder="Enter comments in regards to status for future reference"
+                            className="font-mono text-black text-left text-xl px" />
+                    </div>
 
                     <div className="flex flex-row w-full space-y-4 flex-nowrap items-center mt-15">
                         <div className="flex text-base w-full space-y-4 flex-wrap flex-col items-center mt-10 pb-10">
