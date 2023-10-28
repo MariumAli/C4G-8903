@@ -38,7 +38,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(initialVisibleColumns));
     const [statusFilter, setStatusFilter] = React.useState("all");
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [openedRow, setOpenedRow] = React.useState(null);
     const [selectedApplicantHouseholdMembers, setSelectedApplicantHouseholdMembers] = React.useState([]);
     const [sortDescriptor, setSortDescriptor] = React.useState({
