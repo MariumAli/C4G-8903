@@ -367,8 +367,8 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                     </label>
                 </div>
             </div>
-                <div>
-                    <Alert severity="info" className="container px-15">Please use the Status filter to filter <b>Pending</b> records</Alert>
+                <div className="flex container w-full">
+                    <Alert severity="info" className="flex w-full px-15">Please use the Status filter to filter <b>Pending</b> records</Alert>
                 </div>
             </>
         );
@@ -416,7 +416,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
     }, [selectedKeys, page, pages, filteredItems.length, onNextPage, onPreviousPage]);
 
     return (
-        <div className="max-w-full min-w-full">
+        <div className="min-w-full">
 
             <Table
                 aria-label="All Records"
@@ -426,6 +426,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                 classNames={{
                     wrapper: "max-h-[1200px] max-w-full	min-w-full",
                 }}
+                className="flex"
                 // selectedKeys={selectedKeys}
                 // selectionMode="multiple"
                 sortDescriptor={sortDescriptor}
