@@ -2,68 +2,63 @@ import React, { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react"
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@nextui-org/react";
 import { useRouter } from 'next/router';
+import NavItem from "@/components/NavItem";
 
 // import UWALogo from ''
 
 
 
 const MENU_LIST = [
-  { title: "Home", href: "/" },
-  { title: "About", href: "/about" },
-  { title: "Audit", href: "/audit" },
-  { title: "Users", href: "/users" },
+  { text: "Home", href: "/" },
+  { text: "About", href: "/about" },
+  { text: "Audit", href: "/audit" },
+  { text: "Users", href: "/users" },
 ];
 
 export default function NavigationBar() {
+  const [navActive, setNavActive] = useState(null);
+  const [activeIdx, setActiveIdx] = useState(-1);
   const { data: session } = useSession();
-  const { asPath } = useRouter();
 
 
   return (
-    <Navbar className="w-screen flex w-full flex-row place-content-between items-center border-b-2 border-zinc-500 border-opacity-75 p-5" isBordered >
-      <NavbarBrand >
-        {/* <img src="/UWALogo.png" width="30%" /> */}
-        
+    <header>
+      <nav className={`nav`}>
+        <img src="/UWALogo.png" width="10%" height="10%" />
         <p className="font-extrabold font-mono">United Way of Metro Atlanta: EFSP Dashboard</p>
-      </NavbarBrand>
-      <div className="mx-5"></div>
-      <div className="mx-5"></div>
-      <NavbarContent className="hidden sm:flex gap-4 inline-flex" justify="center">
+        <div
+          onClick={() => setNavActive(!navActive)}
+          className={`nav__menu-bar`}
+        >
+          <div></div>
+          <div></div>
+        </div>
 
-        {MENU_LIST.map((item, index) => (
-          <NavbarItem key={index} isActive={asPath === item.href} className="text-black">
-            <Link
-              isActive={asPath === item.href}
-              key={index}
-              href={item.href}
-              className="text-black"
-            >
-              {item.title}
-            </Link>
-          </NavbarItem>)
-        )}
-
-      </NavbarContent>
+        <div className={`${navActive ? "active font-bold" : ""} nav__menu-list`}>
+          {MENU_LIST.map((menu, idx) => (
+            <div onClick={() => { setActiveIdx(idx); setNavActive(false); }} key={menu.text}>
+              <NavItem className={activeIdx === idx ? "font-bold" : ""} active={activeIdx === idx} {...menu} />
+            </div>
+          ))}
 
 
-      <div className="mx-5"></div>
-      <div className="mx-5"></div>
-      <NavbarContent className="inline-flex" justify="end">
-        {session ? (
-          <NavbarItem>
-            <Button onClick={() => signOut()} color="danger" variant="flat">
-              Sign Out
-            </Button>
-          </NavbarItem>
-        ) : (
 
-          <NavbarItem>
-            <Button onClick={() => signIn()} color="primary" variant="flat">
-              Sign In
-            </Button>
-          </NavbarItem>
-        )}
-      </NavbarContent>
-    </Navbar>
+          {session ? (
+            <div>
+              <Button onClick={() => signOut()} color="danger" variant="flat">
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+
+            <div>
+              <Button onClick={() => signIn()} color="primary" variant="flat">
+                Sign In
+              </Button>
+            </div>
+          )}
+        </div>
+      </nav>
+    </header>
   );
 }
