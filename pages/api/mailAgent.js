@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 
 export default handler = async (req, res) => {
-
     try {
         const transporter = nodemailer.createTransport({
             port: 465,

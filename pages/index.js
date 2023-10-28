@@ -63,15 +63,18 @@ export default function Home() {
               </CardBody>
             </Card>
           ) : (
-            <div className={styles.card}>
-              <p>
+
+            <Card>
+              <CardHeader>
                 Click below to sign in with your Gmail user account.
-              </p>
-              <br></br>
-              <button className={styles.button} style={{ margin: 'auto' }} onClick={() => signIn()}>
-                Sign In
-              </button>
-            </div>
+              </CardHeader>
+              <CardBody className="flex gap-3">
+                <Button onClick={() => signIn()} color="primary" variant="flat">
+                  Sign In
+                </Button>
+
+              </CardBody>
+            </Card>
 
           )
         }
