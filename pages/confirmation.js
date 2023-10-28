@@ -265,7 +265,7 @@ export default function ConfirmationPage({ params }) {
             }}>
                 <Card>
                     <CardHeader>
-                        <p className="flex font-mono font-medium text-xl mt-10">
+                        <p className="flex font-mono font-medium text-lg mt-10">
                             Page Requires Authentication
                         </p>
                     </CardHeader>
@@ -437,6 +437,13 @@ export default function ConfirmationPage({ params }) {
                     <p className="flex font-mono text-black justify-center text-center items-center text-xl mt-7 mb-7">
                         The following information shows previously approved funding records for applicants that have been detected to be similar to the current pending applicant. Take a look at these to ensure there is no duplication of information or resources before confirming the request.
                     </p>
+                    {
+                        similarRecordsResponse.length == 0 && householdMemberSimilarApplicationRecords.length == 0 && (
+                            <p className="flex font-mono text-black justify-center text-center items-center text-lg mt-7 mb-7">
+                                No records found
+                            </p>
+                        )
+                    }
                     {Object.keys(similarRecordsResponse).map(
                         (name) => {
                             let dob = similarRecordsResponse[name].dob;
@@ -531,9 +538,13 @@ export default function ConfirmationPage({ params }) {
                 </div>
 
                 <div className="flex flex-col flex-nowrap text-base mt-10">
-                    <p className="flex font-mono justify-center uppercase text-black text-center font-bold items-center text-4xl">
-                        Existing Similar HouseHold Member Records
-                    </p>
+                    {
+                        (householdMemberSimilarRecords.length > 0 || memberSimilarRecords.length > 0) && (
+                            <p className="flex font-mono justify-center uppercase text-black text-center font-bold items-center text-4xl">
+                                Existing Similar HouseHold Member Records
+                            </p>
+                        )
+                    }
                     <div className="grid grid-cols-3 gap-3 px-10">
                         {Object.keys(householdMemberSimilarRecords).map(
                             (name) => {

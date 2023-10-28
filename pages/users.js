@@ -181,7 +181,7 @@ export default function Users({ params }) {
             }}>
                 <Card>
                     <CardHeader>
-                        <p className="flex font-mono font-medium text-xl mt-10">
+                        <p className="flex font-mono font-medium text-lg mt-10">
                             Page Requires Authentication
                         </p>
                     </CardHeader>
