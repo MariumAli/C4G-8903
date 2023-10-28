@@ -1,4 +1,3 @@
-import styles from '@/styles/Home.module.css';
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
@@ -6,6 +5,7 @@ import ResponsiveRecordsTable from '@/components/ResponsiveRecordsTable';
 import { columns, initialVisibleColumns } from "@/data";
 import { Button, CircularProgress } from "@nextui-org/react";
 import { CSVLink } from "react-csv";
+import { Card, CardHeader, CardBody, Divider } from "@nextui-org/react";
 
 
 export default function Audit({ params }) {
@@ -115,7 +115,7 @@ export default function Audit({ params }) {
                         console.log("Setting All Applicant Records for email");
                         console.log(records.result);
                         setAllRecordsWithHouseholdMembers(records.result);
-                    } 
+                    }
                 }
             }
 
@@ -210,17 +210,29 @@ export default function Audit({ params }) {
     }
     if (status != "authenticated") {
         return (
-            <main className={styles.main}>
-                <h1>Page Requires Authentication</h1>
-                <br></br>
-                <div className={styles.card}>
-                    <p>Navigate to the home page and sign-in first.</p>
-                    <br></br>
-                    <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
-                        Return Home
-                    </button>
-                </div>
-            </main>
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden",
+                textAlign: "center",
+                minHeight: "100vh",
+            }}>
+                <Card>
+                    <CardHeader>
+                        <p className="flex font-mono font-medium text-xl mt-10">
+                            Page Requires Authentication
+                        </p>
+                    </CardHeader>
+                    <CardBody className="flex gap-3">
+                        <p>Navigate to the home page and sign-in first.</p>
+                        <Button className="text-lg" color="danger" onClick={() => router.push('/')}>
+                            Return Home
+                        </Button>
+
+                    </CardBody>
+                </Card>
+            </div>
         )
     } else if (isLoading) {
         return (
@@ -250,17 +262,30 @@ export default function Audit({ params }) {
         );
     } else if (!["agent", "admin-agent", "admin"].includes(userRole)) {
         return (
-            <main className={styles.main}>
-                <h1>Insufficient Privileges {`(${userRole})`}</h1>
-                <br></br>
-                <div className={styles.card}>
-                    <p>This page requires admin-level privileges to access, sign in with a different account with these privileges to use this page.</p>
-                    <br></br>
-                    <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
-                        Return Home
-                    </button>
-                </div>
-            </main>
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden",
+                textAlign: "center",
+                minHeight: "100vh",
+            }}>
+                <Card>
+                    <CardHeader>
+                        <p className="flex font-mono font-medium text-xl mt-10">
+                            Insufficient Privileges
+                        </p>
+                    </CardHeader>
+                    <CardBody className="flex gap-3">
+                        <p>This page requires agent-level or admin-level privileges to access, sign in with a different account with these privileges to use this page.</p>
+                        <br></br>
+                        <Button className="text-lg" color="danger" onClick={() => router.push('/')}>
+                            Return Home
+                        </Button>
+
+                    </CardBody>
+                </Card>
+            </div>
         )
     } else {
         return (userRole ? (

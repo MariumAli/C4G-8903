@@ -37,7 +37,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(initialVisibleColumns));
     const [statusFilter, setStatusFilter] = React.useState("all");
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [rowsPerPage, setRowsPerPage] = React.useState(15);
     const [openedRow, setOpenedRow] = React.useState(null);
     const [selectedApplicantHouseholdMembers, setSelectedApplicantHouseholdMembers] = React.useState([]);
     const [sortDescriptor, setSortDescriptor] = React.useState({
@@ -56,21 +56,23 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
             async function getHouseHoldMembers() {
                 // console.log("Lets get household member info for applicant: ");
                 // console.log(openedRow);
-                let res_household_members = await fetch(
-                    `/api/getHouseHoldMembers?applicantId=${openedRow.ApplicationId}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "accept": "application/json",
+                if (openedRow && openedRow.ApplicationId) {
+                    let res_household_members = await fetch(
+                        `/api/getHouseHoldMembers?applicantId=${openedRow.ApplicationId}`,
+                        {
+                            method: "GET",
+                            headers: {
+                                "accept": "application/json",
+                            },
                         },
-                    },
-                );
-                let household_members = await res_household_members.json();
+                    );
+                    let household_members = await res_household_members.json();
 
-                // console.log("Setting HouseHold Members for selected applicant");
-                // console.log(household_members);
-                setSelectedApplicantHouseholdMembers(household_members.result);
-                onOpen();
+                    // console.log("Setting HouseHold Members for selected applicant");
+                    // console.log(household_members);
+                    setSelectedApplicantHouseholdMembers(household_members.result);
+                    onOpen();
+                }
             }
             getHouseHoldMembers();
         },

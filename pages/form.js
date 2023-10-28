@@ -7,7 +7,7 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { statusColorMap, dateOptions } from "@/data";
-import { Card, CardBody, Divider } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Divider } from "@nextui-org/react";
 import {
     Input,
     Button,
@@ -202,17 +202,29 @@ export default function Contact() {
 
     if (status != "authenticated") {
         return (
-            <main className={styles.main}>
-                <h1>Page Requires Authentication</h1>
-                <br></br>
-                <div className={styles.card}>
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden",
+                textAlign: "center",
+                minHeight: "100vh",
+            }}>
+            <Card>
+                <CardHeader>
+                <p className="flex font-mono font-medium text-6xl mt-10">
+                    Page Requires Authentication
+                    </p>
+                </CardHeader>
+                <CardBody className="flex gap-3">
                     <p>Navigate to the home page and sign-in first.</p>
-                    <br></br>
-                    <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
+                    <Button className="text-lg" color="danger" onClick={() => router.push('/')}>
                         Return Home
-                    </button>
-                </div>
-            </main>
+                    </Button>
+
+                </CardBody>
+            </Card>
+            </div>
         )
     }
     else if (isLoading) {
@@ -243,17 +255,30 @@ export default function Contact() {
         );
     } else if (!["agent", "admin-agent", "admin"].includes(userRole)) {
         return (
-            <main className={styles.main}>
-                <h1>Insufficient Privileges</h1>
-                <br></br>
-                <div className={styles.card}>
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden",
+                textAlign: "center",
+                minHeight: "100vh",
+            }}>
+            <Card>
+                <CardHeader>
+                    <p className="flex font-mono font-medium text-6xl mt-10">
+                        Insufficient Privileges
+                    </p>
+                </CardHeader>
+                <CardBody className="flex gap-3">
                     <p>This page requires agent-level or admin-level privileges to access, sign in with a different account with these privileges to use this page.</p>
                     <br></br>
-                    <button className={styles.button} style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: "10px", marginBottom: "5px" }} onClick={() => router.push('/')}>
+                    <Button className="text-lg" color="danger" onClick={() => router.push('/')}>
                         Return Home
-                    </button>
-                </div>
-            </main>
+                    </Button>
+
+                </CardBody>
+            </Card>
+            </div>
         )
     } else {
         return (
