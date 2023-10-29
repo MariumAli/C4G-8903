@@ -189,21 +189,21 @@ export default function ConfirmationPage({ params }) {
         router.push('/');
         // window.location.reload();
     }
-    const processApprove = () => {
+    const processApprove = async () => {
         setConfirmRejectPressed(true);
         setApplicationStatus("Approved");
         console.log(applicationStatus);
         addApplication("Approved");
     }
 
-    const processReject = () => {
+    const processReject = async () => {
         setConfirmRejectPressed(true);
         setApplicationStatus("Rejected");
         console.log(applicationStatus);
         addApplication("Rejected");
     }
 
-    const processFurtherInfo = () => {
+    const processFurtherInfo = async () => {
         setConfirmRejectPressed(true);
         setApplicationStatus("Pending - Agent Action");
         console.log(applicationStatus);
@@ -221,6 +221,20 @@ export default function ConfirmationPage({ params }) {
     }
 
     async function addApplication(appStatus) {
+
+        // trigger email notification
+        let res = await fetch(
+            `/api/mailAgent`,
+            {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            },
+        );
+
         var addRecordSuccessValue = false;
         if (router.isReady) {
             let add_res = await fetch(
@@ -241,15 +255,6 @@ export default function ConfirmationPage({ params }) {
         }
         setAddRecordSuccess(addRecordSuccessValue);
         console.log(`Submitted, Success: ${addRecordSuccessValue}`);
-
-        // trigger email notification
-        let res = await fetch(
-            `/api/mailAgent`,
-            {
-                method: "POST",
-                query: data
-            },
-        );
         onOpen();
     }
 
