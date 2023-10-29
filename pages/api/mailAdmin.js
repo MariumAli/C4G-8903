@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 
-export default handler = async (req, res) => {
-
+export default async function handler (req, res) {
     try {
         const transporter = nodemailer.createTransport({
             port: 465,
@@ -25,12 +24,18 @@ export default handler = async (req, res) => {
                 }
             });
         });
+        const data = req.body
+        let admin_email = []
+        for (var key in data.result) {
+            admin_email.push(data.result[key]['email'])
+        }
+        let admin_email_str = admin_email.join(',')
         const mailData = {
             from: {
                 name: "EFSP Admin",
                 address: process.env.NODEMAILER_EMAIL,
             },
-            to: "c4g.efsp.main@gmail.com",
+            to: admin_email_str,
             subject: "EFSP Portal - A request is created or updated",
             text: "Visit https://c4g-efsp.vercel.app/ to view the request.",
         };

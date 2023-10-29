@@ -152,10 +152,26 @@ export default function Contact() {
         }
 
         // trigger email notification
+        let admin_res = await fetch(
+            `/api/getAdmin`
+            ,
+            {
+                method: "GET",
+                headers: {
+                    "accept": "application/json",
+                },
+            },
+        );
+        let admin_data = await admin_res.json();
         let res = await fetch(
             `/api/mailAdmin`,
             {
                 method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(admin_data)
             },
         );
 
