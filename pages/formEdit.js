@@ -1,4 +1,3 @@
-import styles from '@/styles/Home.module.css'
 import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from 'next/router';
@@ -54,12 +53,8 @@ export default function Contact() {
         directIndirect: currentData.DirectIndirect,
     });
 
-    const [formSuccess, setFormSuccess] = useState(false)
-    const [formSuccessMessage, setFormSuccessMessage] = useState("")
     const [householdMembers, setHouseholdMembers] = useState([])
     const [userRole, setUserRole] = useState("invalid");
-
-    const [addRecordSuccess, setAddRecordSuccess] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
 
@@ -91,6 +86,7 @@ export default function Contact() {
     const handleOpen = React.useCallback(() => {
         onOpen();
     }, [onOpen]);
+
 
     useEffect(
         () => {
@@ -139,6 +135,46 @@ export default function Contact() {
         newHouseholdMembers[i][e.target.name] = e.target.value;
         setHouseholdMembers(newHouseholdMembers);
     }
+
+    const isFormInvalid = () => {
+        let mainFormInvalid =
+            (isStringFieldInvalid(formData.applicantFirstName) ||
+                isStringFieldInvalid(formData.applicantLastName) ||
+                isDOBFieldInvalid(formData.applicantDOB) ||
+                isStringFieldInvalid(formData.applicantStreetAddress) ||
+                isLRONumberFieldInvalid(formData.lroNumber) ||
+                isStringFieldInvalid(formData.lroEmail));
+
+        if (mainFormInvalid) {
+            return true;
+        }
+
+        let membersFormInvalid = false;
+
+        for (let i = 0; i < householdMembers.length; i++) {
+            membersFormInvalid = (membersFormInvalid ||
+                isStringFieldInvalid(householdMembers[i].FirstName) ||
+                isStringFieldInvalid(householdMembers[i].LastName) ||
+                isDOBFieldInvalid(householdMembers[i].DOB))
+        }
+        if (membersFormInvalid) {
+            return true;
+        }
+        return false
+    }
+
+    const isStringFieldInvalid = (fieldValue) => {
+        return (!fieldValue || fieldValue == null || fieldValue.trim() == '')
+    }
+
+    const isLRONumberFieldInvalid = (fieldValue) => {
+        return (!fieldValue || parseInt(fieldValue) <= 0)
+    }
+
+    const isDOBFieldInvalid = (fieldValue) => {
+        return (!fieldValue || fieldValue == null || isNaN(new Date(fieldValue)))
+    }
+
 
     const submitForm = async () => {
 
@@ -267,7 +303,6 @@ export default function Contact() {
                     addRecordSuccessValue = addRecordSuccessValue && records.result[0].success;
                 }
             }
-            setAddRecordSuccess(addRecordSuccessValue);
             console.log(`Edit Submitted, Success: ${addRecordSuccessValue}`);
             handleOpen();
         }
@@ -359,622 +394,640 @@ export default function Contact() {
 
                 <div className="flex flex-col flex-nowrap items-center text-base">
                     <p className="flex font-mono font-medium text-6xl mt-10">Application Form</p>
-                    {formSuccess ?
-                        <div className="flex flex-colflex-nowrap items-center">{formSuccessMessage}</div>
-                        : (
-                            <div className="flex w-full flex-col gap-4 px-20 mt-10">
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="text"
-                                        label="Applicant First Name:"
-                                        placeholder="Enter First Name"
-                                        labelPlacement="outside"
-                                        isRequired
-                                        isClearable
-                                        value={formData.applicantFirstName}
-                                        name="applicantFirstName"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['applicantFirstName']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                    <Input
-                                        type="text"
-                                        label="Applicant Middle Name:"
-                                        placeholder="Enter Middle Name"
-                                        labelPlacement="outside"
-                                        isClearable
-                                        name="applicantMiddleName"
-                                        value={formData.applicantMiddleName}
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['applicantMiddleName']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                    <Input
-                                        type="text"
-                                        label="Applicant Last Name:"
-                                        placeholder="Enter Last Name"
-                                        labelPlacement="outside"
-                                        isRequired
-                                        isClearable
-                                        name="applicantLastName"
-                                        value={formData.applicantLastName}
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['applicantLastName']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                    <Input
-                                        type="date"
-                                        label="Applicant Date of Birth:"
-                                        placeholder="Enter Valid DOB"
-                                        labelPlacement="outside"
-                                        isRequired
-                                        isClearable
-                                        name="applicantDOB"
-                                        value={moment(formData.applicantDOB).format("YYYY-MM-DD")}
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['applicantDOB']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                </div>
+                    {
+                        <div className="flex w-full flex-col gap-4 px-20 mt-10">
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="text"
+                                    label="Applicant First Name:"
+                                    placeholder="Enter First Name"
+                                    labelPlacement="outside"
+                                    isRequired
+                                    isClearable
+                                    value={formData.applicantFirstName}
+                                    isInvalid={isStringFieldInvalid(formData.applicantFirstName)}
+                                    errorMessage={isStringFieldInvalid(formData.applicantFirstName) && 'First Name is Required'}
+                                    name="applicantFirstName"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['applicantFirstName']: null
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                                <Input
+                                    type="text"
+                                    label="Applicant Middle Name:"
+                                    placeholder="Enter Middle Name"
+                                    labelPlacement="outside"
+                                    isClearable
+                                    name="applicantMiddleName"
+                                    value={formData.applicantMiddleName}
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['applicantMiddleName']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                                <Input
+                                    type="text"
+                                    label="Applicant Last Name:"
+                                    placeholder="Enter Last Name"
+                                    labelPlacement="outside"
+                                    isRequired
+                                    isClearable
+                                    isInvalid={isStringFieldInvalid(formData.applicantLastName)}
+                                    errorMessage={isStringFieldInvalid(formData.applicantLastName) && 'Last Name is Required'}
+                                    name="applicantLastName"
+                                    value={formData.applicantLastName}
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['applicantLastName']: null
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                                <Input
+                                    type="date"
+                                    label="Applicant Date of Birth:"
+                                    placeholder="Enter Valid DOB"
+                                    labelPlacement="outside"
+                                    isRequired
+                                    isClearable
+                                    name="applicantDOB"
+                                    isInvalid={isDOBFieldInvalid(formData.applicantDOB)}
+                                    errorMessage={isDOBFieldInvalid(formData.applicantDOB) && 'Valid DOB is Required'}
+                                    value={moment(formData.applicantDOB).format("YYYY-MM-DD")}
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['applicantDOB']: null
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                            </div>
 
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="text"
-                                        label="Applicant Street Address:"
-                                        placeholder="Enter Street Address"
-                                        labelPlacement="outside"
-                                        isRequired
-                                        isClearable
-                                        value={formData.applicantStreetAddress}
-                                        name="applicantStreetAddress"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['applicantStreetAddress']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                    <Input
-                                        type="text"
-                                        label="Applicant City:"
-                                        placeholder="Enter a Valid City"
-                                        labelPlacement="outside"
-                                        isRequired
-                                        isClearable
-                                        value={formData.applicantCity}
-                                        name="applicantCity"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['applicantCity']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                    <Input
-                                        type="text"
-                                        label="Applicant Postal Code:"
-                                        placeholder="75300 - 5 digit"
-                                        labelPlacement="outside"
-                                        isRequired
-                                        isClearable
-                                        value={formData.applicantPostalCode}
-                                        name="applicantPostalCode"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['applicantPostalCode']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                    <Input
-                                        type="text"
-                                        label="Applicant Country:"
-                                        placeholder="Applicant Country"
-                                        labelPlacement="outside"
-                                        value={formData.applicantCountry}
-                                        isRequired
-                                        isReadOnly
-                                        onChange={handleInput}
-                                    />
-                                </div>
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="text"
+                                    label="Applicant Street Address:"
+                                    placeholder="Enter Street Address"
+                                    labelPlacement="outside"
+                                    isRequired
+                                    isClearable
+                                    value={formData.applicantStreetAddress}
+                                    isInvalid={isStringFieldInvalid(formData.applicantStreetAddress)}
+                                    errorMessage={isStringFieldInvalid(formData.applicantStreetAddress) && 'Street Address is Required'}
+                                    name="applicantStreetAddress"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['applicantStreetAddress']: null
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                                <Input
+                                    type="text"
+                                    label="Applicant City:"
+                                    placeholder="Enter a Valid City"
+                                    labelPlacement="outside"
+                                    isRequired
+                                    isReadOnly
+                                    value={formData.applicantCity}
+                                    name="applicantCity"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['applicantCity']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                                <Input
+                                    type="text"
+                                    label="Applicant Postal Code:"
+                                    placeholder="75300 - 5 digit"
+                                    labelPlacement="outside"
+                                    isRequired
+                                    isClearable
+                                    value={formData.applicantPostalCode}
+                                    isInvalid={isStringFieldInvalid(formData.applicantPostalCode) || formData.applicantPostalCode.trim().length < 5}
+                                    errorMessage={(isStringFieldInvalid(formData.applicantPostalCode) || formData.applicantPostalCode.trim().length < 5) && '5 digit Postal Code is Required'}
+                                    name="applicantPostalCode"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['applicantPostalCode']: null
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                                <Input
+                                    type="text"
+                                    label="Applicant Country:"
+                                    placeholder="Applicant Country"
+                                    labelPlacement="outside"
+                                    value={formData.applicantCountry}
+                                    isRequired
+                                    isReadOnly
+                                    onChange={handleInput}
+                                />
+                            </div>
 
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="number"
-                                        label="LRO Number"
-                                        placeholder="0"
-                                        labelPlacement="outside"
-                                        isRequired
-                                        isClearable
-                                        value={formData.lroNumber}
-                                        name="lroNumber"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['lroNumber']: ''
-                                        }))}
-                                        step={1}
-                                        onChange={handleInput}
-                                    />
-                                    <Input
-                                        type="email"
-                                        label="LRO Email:"
-                                        placeholder="you@example.com"
-                                        labelPlacement="outside"
-                                        isClearable
-                                        isRequired
-                                        value={formData.lroEmail}
-                                        name="lroEmail"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['lroEmail']: ''
-                                        }))}
-                                        startContent={
-                                            <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                                        }
-                                        onChange={handleInput}
-                                    />
-                                </div>
-
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Select
-                                        type="text"
-                                        label="Jurisdiction:"
-                                        placeholder="Jurisdiction"
-                                        labelPlacement="outside"
-                                        isClearable
-                                        value={formData.jurisdiction}
-                                        name="jurisdiction"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['jurisdiction']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    >
-                                        <SelectItem key="Atlanta/Fulton/DeKalb">Atlanta/Fulton/DeKalb</SelectItem>
-                                        <SelectItem key="Coweta">Coweta</SelectItem>
-                                        <SelectItem key="Douglas">Douglas</SelectItem>
-                                        <SelectItem key="Gwinnett">Gwinnett</SelectItem>
-                                        <SelectItem key="Rockdale">Rockdale</SelectItem>
-                                        <SelectItem key="Cherokee">Cherokee</SelectItem>
-                                        <SelectItem key="Paulding">Paulding</SelectItem>
-                                        <SelectItem key="Fayette">Fayette</SelectItem>
-                                    </Select>
-
-                                    <Select
-                                        type="text"
-                                        label="Funding Phase:"
-                                        placeholder="Funding Phase"
-                                        labelPlacement="outside"
-                                        isClearable
-                                        value={formData.fundingPhase}
-                                        name="fundingPhase"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['fundingPhase']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    >
-                                        <SelectItem key="ARPA-R">ARPA-R</SelectItem>
-                                        {Array.from({ length: 62 }, (v, k) => k + 39).map(
-                                            (phase) => {
-                                                return <SelectItem key={phase}>{`${phase}`}</SelectItem>;
-                                            }
-                                        )}
-                                    </Select>
-                                </div>
-
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="text"
-                                        label="Agency Name:"
-                                        placeholder="Enter Agency Name"
-                                        labelPlacement="outside"
-                                        isClearable
-                                        value={formData.agencyName}
-                                        name="agencyName"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['agencyName']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                    <Input
-                                        type="text"
-                                        label="Payment Vendor:"
-                                        placeholder="Payment Vendor"
-                                        labelPlacement="outside"
-                                        isClearable
-                                        value={formData.paymentVendor}
-                                        name="paymentVendor"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['paymentVendor']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                    />
-                                </div>
-
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="number"
-                                        label="Lodging Night Count:"
-                                        placeholder="0"
-                                        labelPlacement="outside"
-                                        isClearable
-                                        value={formData.lodgingNightCount}
-                                        name="lodgingNightCount"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['lodgingNightCount']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={1}
-                                    />
-                                    <Input
-                                        type="number"
-                                        label="Lodging Night Cost ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.lodgingNightCost}
-                                        name="lodgingNightCost"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['lodgingNightCost']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                    <Input
-                                        type="number"
-                                        label="LRO Funded Lodging Night Cost ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.lodgingNightCostLRO}
-                                        name="lodgingNightCostLRO"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['lodgingNightCostLRO']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                </div>
-
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="number"
-                                        label="One Month Rent ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyRent}
-                                        name="monthlyRent"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyRent']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                    <Input
-                                        type="number"
-                                        label="LRO Funded One Month Rent ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyRentLRO}
-                                        name="monthlyRentLRO"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyRentLRO']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                </div>
-
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="number"
-                                        label="One Month Mortgage ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyMortgage}
-                                        name="monthlyMortgage"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyMortgage']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                    <Input
-                                        type="number"
-                                        label="LRO Funded One Month Mortgage ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyMortgageLRO}
-                                        name="monthlyMortgageLRO"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyMortgageLRO']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                </div>
-
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="number"
-                                        label="One Month Gas ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyGas}
-                                        name="monthlyGas"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyGas']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                    <Input
-                                        type="number"
-                                        label="LRO Funded One Month Gas ($): "
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyGasLRO}
-                                        name="monthlyGasLRO"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyGasLRO']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                </div>
-
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="number"
-                                        label="One Month Electric ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyElectric}
-                                        name="monthlyElectric"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyElectric']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                    <Input
-                                        type="number"
-                                        label="LRO Funded One Month Electric ($):"
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyElectricLRO}
-                                        name="monthlyElectricLRO"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyElectricLRO']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                </div>
-
-                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <Input
-                                        type="number"
-                                        label="One Month Water ($): "
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyWater}
-                                        name="monthlyWater"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyWater']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                    <Input
-                                        type="number"
-                                        label="LRO Funded One Month Water ($): "
-                                        placeholder="0.00"
-                                        labelPlacement="outside"
-                                        startContent={
-                                            <div className="pointer-events-none flex items-center">
-                                                <span className="text-default-400 text-small">$</span>
-                                            </div>
-                                        }
-                                        isClearable
-                                        value={formData.monthlyWaterLRO}
-                                        name="monthlyWaterLRO"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['monthlyWaterLRO']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        step={0.01}
-                                    />
-                                </div>
-
-                                <div className="flex w-full text-black flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                    <RadioGroup
-                                        label="Select Direct/Indirect:"
-                                        placeholder="Select Direct/Indirect:"
-                                        orientation="horizontal"
-                                        value={formData.directIndirect}
-                                        name="directIndirect"
-                                        onClear={() => setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['directIndirect']: ''
-                                        }))}
-                                        onChange={handleInput}
-                                        className="text-black"
-                                    >
-                                        <Radio value="direct">Direct</Radio>
-                                        <Radio value="indirect">Indirect</Radio>
-
-                                    </RadioGroup>
-                                </div>
-
-                                <div className="flex w-full flex-col gap-3 px-10">
-                                    {
-                                        householdMembers.length > 0 ?
-                                            (<p className="flex  items-center font-mono font-medium text-3xl mt-10">Additional Household Members</p>) : ''
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="number"
+                                    label="LRO Number"
+                                    placeholder="0"
+                                    labelPlacement="outside"
+                                    isRequired
+                                    isClearable
+                                    value={formData.lroNumber}
+                                    name="lroNumber"
+                                    isInvalid={isLRONumberFieldInvalid(formData.lroNumber)}
+                                    errorMessage={isLRONumberFieldInvalid(formData.lroNumber) && 'LRO Number > 0 is Required'}
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['lroNumber']: null
+                                    }))}
+                                    step={1}
+                                    onChange={handleInput}
+                                />
+                                <Input
+                                    type="email"
+                                    label="LRO Email:"
+                                    placeholder="you@example.com"
+                                    labelPlacement="outside"
+                                    isClearable
+                                    isRequired
+                                    value={formData.lroEmail}
+                                    isInvalid={isStringFieldInvalid(formData.lroEmail)}
+                                    errorMessage={isStringFieldInvalid(formData.lroEmail) && 'LRO Email is Required'}
+                                    name="lroEmail"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['lroEmail']: null
+                                    }))}
+                                    startContent={
+                                        <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                                     }
+                                    onChange={handleInput}
+                                />
+                            </div>
 
-                                    {householdMembers.map(
-                                        (element, index) => {
-                                            return (
-                                                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4" key={index}>
-                                                    <Input
-                                                        type="text"
-                                                        label="First Name:"
-                                                        placeholder="Enter First Name"
-                                                        labelPlacement="outside"
-                                                        isRequired
-                                                        isClearable
-                                                        value={element.FirstName}
-                                                        name="FirstName"
-                                                        onClear={(index) => {
-                                                            let newHouseholdMembers = [...householdMembers];
-                                                            newHouseholdMembers[index]["FirstName"] = '';
-                                                            setHouseholdMembers(newHouseholdMembers);
-                                                        }}
-                                                        onChange={e => handleMemberInput(index, e)} />
-                                                    <Input
-                                                        type="text"
-                                                        label="Middle Name:"
-                                                        placeholder="Enter Middle Name"
-                                                        labelPlacement="outside"
-                                                        isClearable
-                                                        value={element.MiddleName}
-                                                        name="MiddleName"
-                                                        onClear={(index) => {
-                                                            let newHouseholdMembers = [...householdMembers];
-                                                            newHouseholdMembers[index]["MiddleName"] = '';
-                                                            setHouseholdMembers(newHouseholdMembers);
-                                                        }}
-                                                        onChange={e => handleMemberInput(index, e)} />
-                                                    <Input
-                                                        type="text"
-                                                        label="Last Name:"
-                                                        placeholder="Enter Last Name"
-                                                        labelPlacement="outside"
-                                                        isRequired
-                                                        isClearable
-                                                        value={element.LastName}
-                                                        name="LastName"
-                                                        onClear={(index) => {
-                                                            let newHouseholdMembers = [...householdMembers];
-                                                            newHouseholdMembers[index]["LastName"] = '';
-                                                            setHouseholdMembers(newHouseholdMembers);
-                                                        }}
-                                                        onChange={e => handleMemberInput(index, e)} />
-                                                    <Input
-                                                        type="date"
-                                                        label="Date of Birth:"
-                                                        placeholder="Enter Valid DOB"
-                                                        labelPlacement="outside"
-                                                        isRequired
-                                                        isClearable
-                                                        value={moment(element.DOB).format("YYYY-MM-DD")}
-                                                        name="DOB"
-                                                        onClear={(index) => {
-                                                            let newHouseholdMembers = [...householdMembers];
-                                                            newHouseholdMembers[index]["DOB"] = '';
-                                                            setHouseholdMembers(newHouseholdMembers);
-                                                        }}
-                                                        onChange={e => handleMemberInput(index, e)} />
-                                                </div>
-                                            );
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Select
+                                    type="text"
+                                    label="Jurisdiction:"
+                                    placeholder="Jurisdiction"
+                                    labelPlacement="outside"
+                                    isClearable
+                                    value={formData.jurisdiction}
+                                    name="jurisdiction"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['jurisdiction']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                >
+                                    <SelectItem key="Atlanta/Fulton/DeKalb">Atlanta/Fulton/DeKalb</SelectItem>
+                                    <SelectItem key="Coweta">Coweta</SelectItem>
+                                    <SelectItem key="Douglas">Douglas</SelectItem>
+                                    <SelectItem key="Gwinnett">Gwinnett</SelectItem>
+                                    <SelectItem key="Rockdale">Rockdale</SelectItem>
+                                    <SelectItem key="Cherokee">Cherokee</SelectItem>
+                                    <SelectItem key="Paulding">Paulding</SelectItem>
+                                    <SelectItem key="Fayette">Fayette</SelectItem>
+                                </Select>
+
+                                <Select
+                                    type="text"
+                                    label="Funding Phase:"
+                                    placeholder="Funding Phase"
+                                    labelPlacement="outside"
+                                    isClearable
+                                    value={formData.fundingPhase}
+                                    name="fundingPhase"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['fundingPhase']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                >
+                                    <SelectItem key="ARPA-R">ARPA-R</SelectItem>
+                                    {Array.from({ length: 62 }, (v, k) => k + 39).map(
+                                        (phase) => {
+                                            return <SelectItem key={phase}>{`${phase}`}</SelectItem>;
                                         }
                                     )}
-                                </div>
-
-                                <div className="flex text-base w-full space-y-4 flex-wrap md:flex-nowrap mb-6 md:mb-0 items-center flex-col mt-10 pb-10">
-                                    <Button color="default" onClick={() => addMember()}>Add Member</Button>
-
-                                    <Button color="primary" onClick={() => submitForm()}>Confirm Edit</Button>
-                                    <Button color="danger" onClick={() => router.push('/')}>Cancel Edit and Return to Home Page</Button>
-                                </div>
+                                </Select>
                             </div>
-                        )
+
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="text"
+                                    label="Agency Name:"
+                                    placeholder="Enter Agency Name"
+                                    labelPlacement="outside"
+                                    isClearable
+                                    value={formData.agencyName}
+                                    name="agencyName"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['agencyName']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                                <Input
+                                    type="text"
+                                    label="Payment Vendor:"
+                                    placeholder="Payment Vendor"
+                                    labelPlacement="outside"
+                                    isClearable
+                                    value={formData.paymentVendor}
+                                    name="paymentVendor"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['paymentVendor']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                />
+                            </div>
+
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="number"
+                                    label="Lodging Night Count:"
+                                    placeholder="0"
+                                    labelPlacement="outside"
+                                    isClearable
+                                    value={formData.lodgingNightCount}
+                                    name="lodgingNightCount"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['lodgingNightCount']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={1}
+                                />
+                                <Input
+                                    type="number"
+                                    label="Lodging Night Cost ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.lodgingNightCost}
+                                    name="lodgingNightCost"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['lodgingNightCost']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                                <Input
+                                    type="number"
+                                    label="LRO Funded Lodging Night Cost ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.lodgingNightCostLRO}
+                                    name="lodgingNightCostLRO"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['lodgingNightCostLRO']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                            </div>
+
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="number"
+                                    label="One Month Rent ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyRent}
+                                    name="monthlyRent"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyRent']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                                <Input
+                                    type="number"
+                                    label="LRO Funded One Month Rent ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyRentLRO}
+                                    name="monthlyRentLRO"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyRentLRO']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                            </div>
+
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="number"
+                                    label="One Month Mortgage ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyMortgage}
+                                    name="monthlyMortgage"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyMortgage']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                                <Input
+                                    type="number"
+                                    label="LRO Funded One Month Mortgage ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyMortgageLRO}
+                                    name="monthlyMortgageLRO"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyMortgageLRO']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                            </div>
+
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="number"
+                                    label="One Month Gas ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyGas}
+                                    name="monthlyGas"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyGas']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                                <Input
+                                    type="number"
+                                    label="LRO Funded One Month Gas ($): "
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyGasLRO}
+                                    name="monthlyGasLRO"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyGasLRO']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                            </div>
+
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="number"
+                                    label="One Month Electric ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyElectric}
+                                    name="monthlyElectric"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyElectric']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                                <Input
+                                    type="number"
+                                    label="LRO Funded One Month Electric ($):"
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyElectricLRO}
+                                    name="monthlyElectricLRO"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyElectricLRO']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                            </div>
+
+                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <Input
+                                    type="number"
+                                    label="One Month Water ($): "
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyWater}
+                                    name="monthlyWater"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyWater']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                                <Input
+                                    type="number"
+                                    label="LRO Funded One Month Water ($): "
+                                    placeholder="0.00"
+                                    labelPlacement="outside"
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">$</span>
+                                        </div>
+                                    }
+                                    isClearable
+                                    value={formData.monthlyWaterLRO}
+                                    name="monthlyWaterLRO"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['monthlyWaterLRO']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    step={0.01}
+                                />
+                            </div>
+
+                            <div className="flex w-full text-black flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                <RadioGroup
+                                    label="Select Direct/Indirect:"
+                                    placeholder="Select Direct/Indirect:"
+                                    orientation="horizontal"
+                                    value={formData.directIndirect}
+                                    name="directIndirect"
+                                    onClear={() => setFormData((prevState) => ({
+                                        ...prevState,
+                                        ['directIndirect']: ''
+                                    }))}
+                                    onChange={handleInput}
+                                    className="text-black"
+                                >
+                                    <Radio value="direct">Direct</Radio>
+                                    <Radio value="indirect">Indirect</Radio>
+
+                                </RadioGroup>
+                            </div>
+
+                            <div className="flex w-full flex-col gap-3 px-10">
+                                {
+                                    householdMembers.length > 0 ?
+                                        (<p className="flex  items-center font-mono font-medium text-3xl mt-10">Additional Household Members</p>) : ''
+                                }
+
+                                {householdMembers.map(
+                                    (element, index) => {
+                                        return (
+                                            <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4" key={index}>
+                                                <Input
+                                                    type="text"
+                                                    label="First Name:"
+                                                    placeholder="Enter First Name"
+                                                    labelPlacement="outside"
+                                                    isRequired
+                                                    isClearable
+                                                    value={element.FirstName}
+                                                    name="FirstName"
+                                                    isInvalid={isStringFieldInvalid(element.FirstName)}
+                                                    errorMessage={isStringFieldInvalid(element.FirstName) && 'First Name is Required'}
+                                                    onClear={(index) => {
+                                                        let newHouseholdMembers = [...householdMembers];
+                                                        newHouseholdMembers[index]["FirstName"] = null;
+                                                        setHouseholdMembers(newHouseholdMembers);
+                                                    }}
+                                                    onChange={e => handleMemberInput(index, e)} />
+                                                <Input
+                                                    type="text"
+                                                    label="Middle Name:"
+                                                    placeholder="Enter Middle Name"
+                                                    labelPlacement="outside"
+                                                    isClearable
+                                                    value={element.MiddleName}
+                                                    name="MiddleName"
+                                                    onClear={(index) => {
+                                                        let newHouseholdMembers = [...householdMembers];
+                                                        newHouseholdMembers[index]["MiddleName"] = '';
+                                                        setHouseholdMembers(newHouseholdMembers);
+                                                    }}
+                                                    onChange={e => handleMemberInput(index, e)} />
+                                                <Input
+                                                    type="text"
+                                                    label="Last Name:"
+                                                    placeholder="Enter Last Name"
+                                                    labelPlacement="outside"
+                                                    isRequired
+                                                    isClearable
+                                                    value={element.LastName}
+                                                    isInvalid={isStringFieldInvalid(element.LastName)}
+                                                    errorMessage={isStringFieldInvalid(element.LastName) && 'Last Name is Required'}
+                                                    name="LastName"
+                                                    onClear={(index) => {
+                                                        let newHouseholdMembers = [...householdMembers];
+                                                        newHouseholdMembers[index]["LastName"] = null;
+                                                        setHouseholdMembers(newHouseholdMembers);
+                                                    }}
+                                                    onChange={e => handleMemberInput(index, e)} />
+                                                <Input
+                                                    type="date"
+                                                    label="Date of Birth:"
+                                                    placeholder="Enter Valid DOB"
+                                                    labelPlacement="outside"
+                                                    isRequired
+                                                    isClearable
+                                                    value={moment(element.DOB).format("YYYY-MM-DD")}
+                                                    name="DOB"
+                                                    isInvalid={isDOBFieldInvalid(element.DOB)}
+                                                    errorMessage={isDOBFieldInvalid(element.DOB) && 'Valid DOB is Required'}
+                                                    onClear={(index) => {
+                                                        let newHouseholdMembers = [...householdMembers];
+                                                        newHouseholdMembers[index]["DOB"] = null;
+                                                        setHouseholdMembers(newHouseholdMembers);
+                                                    }}
+                                                    onChange={e => handleMemberInput(index, e)} />
+                                            </div>
+                                        );
+                                    }
+                                )}
+                            </div>
+
+                            <div className="flex text-base w-full space-y-4 flex-wrap md:flex-nowrap mb-6 md:mb-0 items-center flex-col mt-10 pb-10">
+                                <Button color="default" onClick={() => addMember()}>Add Member</Button>
+
+                                <Button color="primary" isDisabled={isFormInvalid()} onClick={() => submitForm()}>Confirm Edit</Button>
+                                <Button color="danger" onClick={() => router.push('/')}>Cancel Edit and Return to Home Page</Button>
+                            </div>
+                        </div>
+
                     }
                     {
                         isOpen ?

@@ -11,32 +11,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 6rem;
-  justify-items: center;
-  margin: 0px;
-  overflow-x: scroll;
-  font-family: var(--font-mono);
-  font-size: 16px;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  color: #FFFFFF; /* Adjust the text color to your preference */
+  background-color: #FFFFFF; /* Adjust the text color to your preference */
 }
 
-.auditmain {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-  padding: 6rem;
-  justify-items: center;
-  margin: 0px;
-  overflow-x: scroll;
-  font-family: var(--font-mono);
-  font-size: 16px;
+.main .card {
+  width: 100%;
+  max-width: 600px; /* Adjust the max-width to your preference */
+  margin: 20px;
+  background-color: #FFFFFF; /* Adjust the text color to your preference */
 }
 
-.auditmain h1 {
-  text-decoration: dashed;
-  font-weight: 700;
-  font-family:Verdana, Geneva, Tahoma, sans-serif;
-  margin-top: 3rem;
-}
 
 
 .main h1 {

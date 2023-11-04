@@ -5,7 +5,7 @@ import ResponsiveRecordsTable from '@/components/ResponsiveRecordsTable';
 import { columns, initialVisibleColumns } from "@/data";
 import { Button, CircularProgress } from "@nextui-org/react";
 import { CSVLink } from "react-csv";
-import { Card, CardHeader, CardBody, Divider } from "@nextui-org/react";
+import { Card, CardHeader, CardBody } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 
 

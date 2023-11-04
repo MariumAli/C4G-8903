@@ -38,7 +38,7 @@
     #00000080
   );
 
-  --callout-rgb: 238, 240, 241;
+  --callout-rgb: #00000010;
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
@@ -106,12 +106,13 @@ a {
 
 nav{
   display: flex;
-  padding: 16px;
-  justify-content: space-between;
   align-items: center;
-  background-color: rgba(var(--card-rgb), 0.25);
+  padding: 1rem;
+  justify-content: space-between;
+  background-color: rgba(var(--callout-rgb));
   font-family: var(--font-mono);
 }
+
 .nav__menu-bar{
   display: flex;
   flex-direction: column;
@@ -121,7 +122,7 @@ nav{
 .nav__menu-bar div{
   width: 40px;
   height: 4px;
-  background-color: rgba(var(--card-rgb));
+  background-color: rgba(var(--callout-rgb));
   border-radius: 2px;
 }
 .nav__menu-list{
@@ -171,7 +172,7 @@ nav{
     height: 6px;
     bottom: -16px;
     left: 0;
-    background-color: rgba(var(--card-border-rgb));
+    background-color: rgba(var(--callout-rgb));
     transition: all 0.2s;
   }
 
