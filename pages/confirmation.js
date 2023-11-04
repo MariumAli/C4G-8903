@@ -1,4 +1,3 @@
-import styles from '@/styles/Home.module.css'
 import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from 'next/router';

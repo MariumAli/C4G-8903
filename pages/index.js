@@ -13,8 +13,7 @@ Emergency Food and Shelter Program Dashboard\
 
 const WELCOME_PROMPT = "\
 This application is an online portal for logging and monitoring funding \
-requests to the EFSP database. To use these capabilities, log in with the \
-button below.\
+requests to the EFSP database. \
 "
 
 
@@ -31,32 +30,33 @@ export default function Home() {
   return (
     <>
       <main className={styles.main}>
-        <Card>
+      <div className="w-1/2 relative items-center text-center inline">
+        <img
+          src="/computing_for_good.png"
+          alt="Background Image"
+          className='inline'
+        />
+      </div>
+      <br />
+
+        <Card className='shadow-none'>
           <CardBody>
-            <p>{WELCOME_MESSAGE}</p>
+            <p className="uppercase font-mono font-extrabold text-2xl">{WELCOME_MESSAGE}</p>
           </CardBody>
         </Card>
 
-        <br></br>
-        <br></br>
-
-        <Card>
+        <Card className='shadow-none'>
           <CardBody>
-            <p>{WELCOME_PROMPT}</p>
+            <p className="uppercase font-mono font-bold text-xl">{WELCOME_PROMPT}</p>
           </CardBody>
         </Card>
-        <br></br>
-        <br></br>
 
         {
           status == "authenticated" ? (
-            <Card>
-              <CardHeader>
-                Click below to display a form for submitting a new application.
-              </CardHeader>
+            <Card className='shadow-none'>
               <CardBody className="flex gap-3">
 
-                <Button className="text-lg" color="primary" startContent={<PlusIcon />} onClick={() => router.push('/form')}>
+                <Button className="uppercase font-mono font-bold text-xl" color="warning" startContent={<PlusIcon />} onClick={() => router.push('/form')}>
                   Process New Application
                 </Button>
 
@@ -64,8 +64,8 @@ export default function Home() {
             </Card>
           ) : (
 
-            <Card>
-              <CardHeader>
+            <Card className='shadow-none'>
+              <CardHeader className="uppercase font-mono font-bold text-base">
                 Click below to sign in with your Gmail user account.
               </CardHeader>
               <CardBody className="flex gap-3">

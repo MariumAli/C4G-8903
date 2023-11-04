@@ -164,4 +164,4 @@ function calculate_distance(a, b) {
     }
     console.log("Levenshtein distance: " + matrix[b.length][a.length]);
     return matrix[b.length][a.length];
-};
+}
