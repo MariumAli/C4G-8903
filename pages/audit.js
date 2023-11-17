@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import ResponsiveRecordsTable from '@/components/ResponsiveRecordsTable';
@@ -18,7 +18,7 @@ export default function Audit({ params }) {
     const [isLoading, setIsLoading] = useState(true);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [modalText, setModalText] = useState("");
-
+    const csvLinkRef = useRef();
 
     useEffect(
         () => {
@@ -174,10 +174,8 @@ export default function Audit({ params }) {
         window.location.reload();
     }
 
-    const submitDeleteAllRecords = async (e) => {
-        // We don't want the page to refresh
-        e.preventDefault();
-
+    const submitDeleteAllRecords = async () => {
+        csvLinkRef?.current?.link.click();
         let res = await fetch(
             `/api/removeAllRecords`,
             {
@@ -190,9 +188,9 @@ export default function Audit({ params }) {
         );
         let res_json = await res.json();
         console.log(`Remove all record call response status: ${res.status}`);
-        alert(res_json.result);
-
-        window.location.reload();
+        // alert(res_json.result);
+        setModalText(`Removed All Records`);
+        onOpen();
     }
 
     async function editApplication(record) {
@@ -302,7 +300,7 @@ export default function Audit({ params }) {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Successfull</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Successful</ModalHeader>
                             <ModalBody>
                                 <p>
                                     {modalText}
@@ -337,7 +335,7 @@ export default function Audit({ params }) {
                                     {"Exports all Records to an Excel file"}
                                 </p>
                                 {/* Export Button Start */}
-                                <Button color="primary">
+                                <Button color="primary" >
                                     <CSVLink id="download-records-form" filename={`records-${new Date().toDateString()}.csv`}
                                         data={allRecordsWithHouseholdMembers}>
                                         Export Records to CSV
@@ -350,8 +348,11 @@ export default function Audit({ params }) {
                                 <p className="flex font-mono font-medium text-sm">
                                     {"Deletes all Records and resets the Database"}
                                 </p>
-                                <Button color="danger" onClick={(e) => submitDeleteAllRecords(e)}>
-                                    Delete All Records
+                                <Button color="danger">
+                                    <CSVLink className="flex items-center justify-center bg-[#f31260] text-white" id="download-records-form" filename={`records-${new Date().toDateString()}.csv`} ref={csvLinkRef}
+                                        data={allRecordsWithHouseholdMembers} onClick={submitDeleteAllRecords}>
+                                        Delete All Records
+                                    </CSVLink>
                                 </Button>
 
                             </div>

@@ -23,6 +23,7 @@
   max-width: 600px; /* Adjust the max-width to your preference */
   margin: 20px;
   background-color: #FFFFFF; /* Adjust the text color to your preference */
+  color: black;
 }
 
 
@@ -32,6 +33,7 @@
   font-weight: 700;
   font-family:Verdana, Geneva, Tahoma, sans-serif;
   margin-top: 3rem;
+  color: black;
 }
 
 .table {
@@ -41,11 +43,13 @@
   table-layout: fixed;
   margin-top: 3rem;
   word-wrap:break-word;
+  color: black;
 }
 
 .table thead {
   border: 1px solid;
   word-wrap:break-word;
+  color: black;
 }
 
 .table tbody tr td {
@@ -53,6 +57,7 @@
   text-align: center;
   border: 1px solid;
   word-wrap:break-word;
+  color: black;
 }
 
 .description {
@@ -62,6 +67,7 @@
   width: 100%;
   z-index: 2;
   margin-top: 3rem;
+  color: black;
 }
 
 .grid {
@@ -69,6 +75,7 @@
   grid-template-columns: repeat(4, minmax(25%, auto));
   width: var(--max-width);
   max-width: 100%;
+  color: black;
 }
 
 .card {
@@ -79,25 +86,33 @@
   margin-top: 3rem;
   font-family: var(--font-mono);
   font-size: 16px;
+  color: black;
 }
 
 .card span {
   display: inline-block;
   transition: transform 200ms;
+  color: black;
 }
 
 .card h3 {
   font-weight: 600;
   margin-bottom: 0.7rem;
   text-decoration: underline;
+  color: black;
 }
 
 .card p {
-  margin: 0;
-  opacity: 0.6;
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.5;
   /* max-width: 30ch; */
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  text-transform: capitalize;
+
 }
 
 
@@ -107,6 +122,7 @@
   align-items: center;
   position: relative;
   padding: 4rem 0;
+  color: black;
 }
 
 .center::before {
@@ -115,6 +131,7 @@
   width: 480px;
   height: 360px;
   margin-left: -400px;
+  color: black;
 }
 
 .center::after {
@@ -122,6 +139,7 @@
   width: 240px;
   height: 180px;
   z-index: -1;
+  color: black;
 }
 
 .center::before,
@@ -131,6 +149,7 @@
   position: absolute;
   filter: blur(45px);
   transform: translateZ(0);
+  color: black;
 }
 
 .images {
