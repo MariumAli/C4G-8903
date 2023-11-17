@@ -128,7 +128,7 @@ nav{
   display: flex;
   flex-direction: column;
   position: fixed;
-  z-index: 100;
+  z-index: 1;
   top: 60px;
   width: 288px;
   row-gap: 24px;
