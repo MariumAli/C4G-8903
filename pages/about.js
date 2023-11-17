@@ -17,27 +17,6 @@ export default function AboutPage() {
         <meta property="og:title" content="EFSP Dashboard" key="title" />
       </Head>
       <main className={styles.main}>
-        <div className={styles.images}>
-          <span>
-            <Image
-              src="/gtech.png"
-              alt="GA Tech Logo"
-              width={250}
-              height={80}
-              priority
-            />
-          </span>
-          <span>
-            <Image
-              src="/united-way.png"
-              alt="United Way Logo"
-              width={250}
-              height={80}
-              priority
-            />
-          </span>
-        </div>
-
         <h1>
           United Way of Metro Atlanta - Emergency Food and Shelter Program
         </h1>
