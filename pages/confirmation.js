@@ -185,7 +185,7 @@ export default function ConfirmationPage({ params }) {
     );
     const onModalClose = () => {
         onClose()
-        router.push('/');
+        router.push('/audit');
         // window.location.reload();
     }
     const processApprove = async () => {
@@ -543,11 +543,11 @@ export default function ConfirmationPage({ params }) {
 
                 <div className="flex flex-col flex-nowrap text-base mt-10">
                     {
-                        (householdMemberSimilarRecords.length > 0 || memberSimilarRecords.length > 0) && (
+                        (householdMemberSimilarRecords.length > 0 || memberSimilarRecords.length > 0) ? (
                             <p className="flex font-mono justify-center uppercase text-black text-center font-bold items-center text-4xl">
                                 Existing Similar HouseHold Member Records
                             </p>
-                        )
+                        ) : ''
                     }
                     <div className="grid grid-cols-3 gap-3 px-10">
                         {Object.keys(householdMemberSimilarRecords).map(
@@ -559,8 +559,6 @@ export default function ConfirmationPage({ params }) {
                                         return (
                                             <Card key={member.identity}>
                                                 <CardBody>
-                                                    <div align="left"><b>AppllicantId:</b> {member.ApplicantId}</div>
-                                                    <Divider />
                                                     <div align="left"><b>Full Name:</b> {name}</div>
                                                     <div align="left"><b>Date of Birth:</b> {dob}</div>
                                                 </CardBody>
@@ -584,8 +582,6 @@ export default function ConfirmationPage({ params }) {
                                             return (
                                                 <Card key={member.identity}>
                                                     <CardBody>
-                                                        <div align="left"><b>ApplicantId:</b> {member.ApplicantId}</div>
-                                                        <Divider />
                                                         <div align="left"><b>Full Name:</b> {name}</div>
                                                         <div align="left"><b>Date of Birth:</b> {dob}</div>
                                                     </CardBody>

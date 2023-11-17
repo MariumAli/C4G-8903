@@ -33,8 +33,8 @@ export default function NavigationBar() {
 
         <div className={`${navActive ? "active font-bold" : ""} nav__menu-list`}>
           {MENU_LIST.map((menu, idx) => (
-            <div onClick={() => { setActiveIdx(idx); setNavActive(false); }} className={activeIdx === idx ? "active font-bold" : ""} key={menu.text}>
-              <NavItem className={activeIdx === idx ? "active font-bold" : ""} active={activeIdx === idx} {...menu} />
+            <div onClick={() => { setActiveIdx(idx); setNavActive(false); }} key={menu.text}>
+              <NavItem active={activeIdx === idx} {...menu} />
             </div>
           ))}
 

@@ -996,10 +996,10 @@ export default function Contact() {
                                                 <ModalFooter>
                                                     <Button color="danger" onClick={() => {
                                                         onClose();
-                                                        router.push("/");
+                                                        router.push("/audit");
                                                     }}
                                                     >
-                                                        Return Home
+                                                        Return
                                                     </Button>
                                                 </ModalFooter>
                                             </>
