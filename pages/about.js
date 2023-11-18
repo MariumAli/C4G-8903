@@ -23,7 +23,7 @@ export default function AboutPage() {
 
         <div className={`${styles.card} content-center`}>
           <p className="uppercase font-mono font-bold text-xl text-black content-center">
-            About This Project
+            About EFSP Dashboard
           </p>
           <span>
             The Emergency Food and Shelter Program is a federal grant that provides funds to agencies for emergency financial assistance for individuals and families in crisis. United Way of Greater Atlanta administers this grant in eight metro counties.
@@ -31,10 +31,34 @@ export default function AboutPage() {
           </span>
         </div>
 
-        <br></br>
+        <div className={`${styles.card} content-center`}>
+          <p className="uppercase font-mono font-bold text-xl text-black content-center">
+            Goals of EFSP Dashboard
+          </p>
+          <span>
+            <ul>
+              <li>Provide an online form to submit funding requests</li>
+              <li>Provide an automated solution to detect if the funding should be approved or denied</li>
+              <li>Maintain a database of all previous funding grants</li>
+              <li>Provide an interface to view previous grants</li>
+              <li>Enable administers to view the current status of funding</li>
+            </ul>
+          </span>
+        </div>
 
-        <p className="uppercase font-mono font-bold text-xl text-black content-center">
-          Iteration I
+        <Card className='p-5 m-10'>
+          <CardBody className="flex gap-3">
+            <p className="uppercase font-mono font-bold text-xl text-black content-center mt-auto">
+              EFSP Dashboard User Guide
+            </p>
+          </CardBody>
+          <Button className="uppercase font-mono font-bold text-xl" color="warning">
+            <Link href={"https://drive.google.com/file/d/1WTh7Lt6zvVKOXSiVec77uqx4Svfz73Fw/view?usp=sharing"}>{"View User Guide"}</Link>
+          </Button>
+        </Card>
+
+        <p className="uppercase font-mono font-bold text-xl text-black content-center mt-auto">
+          Contributors - Iteration I
         </p>
         <table className={`${styles.table} content-center`}>
           <thead>
@@ -83,8 +107,8 @@ export default function AboutPage() {
 
         <br></br>
 
-        <p className="uppercase font-mono font-bold text-xl text-black content-center">
-          Iteration II
+        <p className="uppercase font-mono font-bold text-xl text-black content-center mt-auto">
+          Contributors - Iteration II
         </p>
         <table className={`${styles.table} content-center`}>
           <thead>
@@ -101,38 +125,23 @@ export default function AboutPage() {
               <td>{'Team Lead and Full Stack Engineer'}</td>
               <td>{"Develop a working and easy to use MVP for client to be able to use. I would like the client to be able to process a new request for shelter as soon as possible identifying the duplication rules and make a decision without much manual interaction. Additionally, the interface should be easy to use and training-free. My goal is to use my expertise and make that happen as a team!"}</td>
               <td>
-                Stakeholder presentations and communication. User Interface and User Experience uplift. User authentication enhancement. Validation logic enhancement. Admin workflow enhancement. Software testing and validation.
+                Stakeholder presentations and communication. User interface and user experience uplift. User authentication enhancement. Validation logic enhancement. Admin approval workflow enhancement. Agent request workflow enhancement. Software testing and validation.
               </td>
             </tr>
             <tr>
               <td>{'Dexter Wah'}</td>
               <td>{'Full Stack Engineer'}</td>
-              <td>{"Develop effective solutions using user-centered design and software development methodology. Contribute to the social impact financing scene using cutting-edge software and innovation. Create value through active collaboration and needfinding."}</td>
+              <td>{"Design and implement impactful solutions by employing user-centered design principles and software development methodologies. Foster value creation through collaborative efforts and proactive needfinding. Support social impact financing using technology and innovative approaches."}</td>
               <td>
-                Agent request workflow enhancement. Admin approval and rejection workflow enhancement. E-mail functionality for admin communication. Queue tracker to monitor pending requests. Database design and schema enhancement. Progress documentation and illustration.
+                Stakeholder communication. Database design enhancement. E-mail notification function. Validation logic enhancement. Admin approval workflow enhancement. Agent request workflow enhancement. Software testing and validation. Progress documentation.
               </td>
             </tr>
           </tbody>
         </table>
 
-        <div className={`${styles.card} content-center`}>
-
-          <p className="uppercase font-mono font-bold text-xl text-black content-center">
-            Goals of this Project
-          </p>
-          <span>
-            <ul>
-              <li>Provide an online form to submit funding requests</li>
-              <li>Provide an automated solution to detect if the funding should be approved or denied</li>
-              <li>Maintain a database of all previous funding grants</li>
-              <li>Provide an interface to view previous grants</li>
-              <li>Enable administers to view the current status of funding</li>
-            </ul>
-          </span>
-        </div>
+        <br></br>
 
         <div className={`${styles.card} content-center`}>
-
           <p className="uppercase font-mono font-bold text-xl text-black content-center">
             Lighthouse scores
           </p>
@@ -146,36 +155,7 @@ export default function AboutPage() {
             </ul>
           </span>
         </div>
-        <Card className='m-10 p-5'>
-          <CardBody className="flex gap-3">
-            <p className="uppercase font-mono font-bold text-xl text-black content-center mt-auto">
-              Project Overview Presentation
-            </p>
-          </CardBody>
-          <Card className='shadow-none p-5'>
-            <Button className="uppercase font-mono font-bold text-xl" color="warning">
-              <Link href={"https://gtvault-my.sharepoint.com/:b:/g/personal/aws3_gatech_edu/EZYxFD0lUUtBuHNpYNKPTEABk-LKQPHTRXvv17vPIYWG0g?e=ZfAMPM"}>{"Presentation Slides Link"}</Link>
-            </Button>
 
-          </Card>
-          <Card className='shadow-none p-5'>
-            <Button className="uppercase font-mono font-bold text-xl" color="warning">
-              <Link href={"https://gtvault-my.sharepoint.com/:v:/g/personal/aws3_gatech_edu/EaXFcW3I-39LplIYwZwvBVcB3J0pgz3hu3tcdVWkyYVT8w?e=XC2KKr"}>{"Presentation Video Link"}</Link>
-            </Button>
-          </Card>
-        </Card>
-
-
-        <Card className='p-5 m-10'>
-          <CardBody className="flex gap-3">
-            <p className="uppercase font-mono font-bold text-xl text-black content-center mt-auto">
-              Project Demo Video
-            </p>
-          </CardBody>
-          <Button className="uppercase font-mono font-bold text-xl" color="warning">
-            <Link href={"https://gtvault-my.sharepoint.com/:v:/g/personal/aws3_gatech_edu/EWfXQtqruUJLpxQ6aMU46TABbUKkOIb7ryLkuSFuHq-UrA?e=J6us2i"}>{"Demo Video Link"}</Link>
-          </Button>
-        </Card>
       </main>
     </>
   )
