@@ -44,6 +44,8 @@
   margin-top: 3rem;
   word-wrap:break-word;
   color: black;
+  font-family: var(--font-mono);
+  font-size: 14px;
 }
 
 .table thead {
