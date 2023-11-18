@@ -133,7 +133,7 @@ export default function AboutPage() {
               <td>{'Full Stack Engineer'}</td>
               <td>{"Design and implement impactful solutions by employing user-centered design principles and software development methodologies. Foster value creation through collaborative efforts and proactive needfinding. Support social impact financing using technology and innovative approaches."}</td>
               <td>
-                Stakeholder communication. Database design enhancement. E-mail notification function. Validation logic enhancement. Admin approval workflow enhancement. Agent request workflow enhancement. Software testing and validation. Progress documentation.
+                Stakeholder communication. Database design enhancement. E-mail notification function. Validation logic enhancement. Admin approval workflow enhancement. Agent request workflow enhancement. Software testing and validation. User guide documentation.
               </td>
             </tr>
           </tbody>
