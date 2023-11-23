@@ -66,7 +66,7 @@ export default function Audit({ params }) {
                         let records = await records_res.json();
 
                         console.log("Setting All Applicant Records for email");
-                        console.log(records.result);
+                        // console.log(records.result);
                         setAllRecords(records.result);
                         setIsLoading(false);
                     } else {

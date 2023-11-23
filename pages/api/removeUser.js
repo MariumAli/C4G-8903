@@ -1,16 +1,6 @@
 import executeQuery from "@/lib/db";
 
 
-function normalizeEmail(email) {
-    let parts = email.split("@");
-    if (parts.length != 2) {
-        throw new Error("Found ill-formed email address.");
-    }
-    let normalizedEmail = parts[0].trim().replaceAll(".", "").toLowerCase() + "@" + parts[1];
-    return normalizedEmail;
-}
-
-
 export default async function handler(req, res) {
     if (req.query.hasOwnProperty('email')) {
         try {

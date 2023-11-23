@@ -309,7 +309,7 @@ export default function ConfirmationPage({ params }) {
                 />
             </div>
         );
-    } else if (!["agent", "agent-admin", "admin"].includes(userRole)) {
+    } else if (!["agent", "admin-agent", "admin"].includes(userRole)) {
         return (
             <div style={{
                 display: "flex",

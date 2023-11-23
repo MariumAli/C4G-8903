@@ -313,7 +313,7 @@ export default function Users({ params }) {
                         >
                             <SelectItem key="agent">agent</SelectItem>
                             <SelectItem key="admin">admin</SelectItem>
-                            {/* <SelectItem key="admin-agent">admin-agent</SelectItem> */}
+                            <SelectItem key="admin-agent">admin-agent</SelectItem>
                         </Select>
                     </div>
 

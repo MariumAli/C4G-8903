@@ -207,7 +207,7 @@ export default function ResponsiveTable({ allRecords, onUpdate, onDelete, onEdit
                                             </Button>
                                         </span>
                                     </Tooltip>
-                                    {userRole == "admin" ? (
+                                    {["admin-agent", "admin"].includes(userRole) ? (
                                         <Tooltip content="Approve Record">
                                             <Button className="text-lg text-default-400 cursor-pointer active:opacity-50" variant="outlined" onClick={() => onUpdate(record, "Approved")}>
                                                 <CheckIcon />
