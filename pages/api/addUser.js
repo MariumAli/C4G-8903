@@ -1,40 +1,7 @@
 import executeQuery from "@/lib/db";
 
-
-function normalizeEmail(email) {
-    let parts = email.split("@");
-    if (parts.length != 2) {
-        throw new Error("Found ill-formed email address.");
-    }
-    let normalizedEmail = parts[0].trim().replaceAll(".", "").toLowerCase() + "@" + parts[1];
-    return normalizedEmail;
-}
-
-
-function normalizeRole(role) {
-    let normalizedRole = role.trim().toLowerCase();
-
-    if ((normalizedRole === "admin") || (normalizedRole === "agent") || (normalizedRole == "admin-agent")) {
-        return normalizedRole;
-    } else {
-        throw new Error("Role must be one of 'agent', 'admin-agent' or 'admin'.");
-    }
-}
-
-
 export default async function handler(req, res) {
-    console.log("inAddUser with query params:", req.query);
-
-    var normalizedEmail = "";
-    var normalizedRole = "";
-
-    try {
-        normalizedEmail = normalizeEmail(req.query.email);
-        normalizedRole = normalizeRole(req.query.role);
-    } catch ( error ) {
-        console.log(error);
-        return res.status(400).json({ result: error.message });
-    }
+    // console.log("in AddUser with query params:", req.query);
 
     try {
         const db_result = await executeQuery(
@@ -42,12 +9,10 @@ export default async function handler(req, res) {
                 query: 'select * from Users'
             }
         );
-        var existingEmails = [];
         for (const entry of db_result) {
-            existingEmails.push(entry["email"]);
-        }
-        if (existingEmails.includes(normalizedEmail)) {
-            return res.status(400).json({ result: "User with provided email already exists."});
+            if(entry["email"] == req.query.email) {
+                return res.status(400).json({ result: "User with provided email already exists."});
+            }
         }
     } catch ( error ) {
         console.log(error);
